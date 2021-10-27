@@ -1,0 +1,32 @@
+body {
+	font-family: "Calibri", serif;
+}
+/* 	background: linear-gradient(135deg, #F0F0F0, #FAFAFA); */
+
+/* font-size: 16px; #E0E0E0 */
+	
+.tuile {
+	margin: 10px;
+	background-color: white;
+	border : solid thin silver;
+}
+
+.tuile div {
+	
+}
+
+.nombre {
+	font-weight: bold;
+}
+
+/* ---- Surcharge Bootstrap ---- */
+ 
+.badge {
+	font-size: 16px;
+}
+
+@media (min-width: 1200px) {
+	.container {
+		min-width: 95%;
+	}
+}
