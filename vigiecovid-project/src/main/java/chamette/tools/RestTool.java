@@ -21,7 +21,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.log4j.*;
 
-public class RestHelper {
+public class RestTool {
 
 	public int returnCode;
 	public JsonObject result;
@@ -41,18 +41,18 @@ public class RestHelper {
 	private HashMap<String, String> headers = new HashMap<String, String>();
 	private Charset entityCharset = null;
 	
-	public RestHelper(String urlStart) {
+	public RestTool(String urlStart) {
 		logger = Logger.getLogger(this.getClass());
 		executor = Executor.newInstance();
 		this.urlStart = urlStart;
 	}
 
-	public RestHelper post(String url, JsonObject json) throws Exception {
+	public RestTool post(String url, JsonObject json) throws Exception {
 		post(url, JsonHelper.getStringFromJsonObject(json));
 		return this;
 	}
 	
-	public RestHelper post(String url, String requestString) throws Exception {
+	public RestTool post(String url, String requestString) throws Exception {
 		simpleCall("POST", url, requestString);
 		return this;
 	}
@@ -63,7 +63,7 @@ public class RestHelper {
 	 * @return This RestHelper object to be fluent
 	 * @throws Exception
 	 */
-	public RestHelper get(String url) throws Exception {
+	public RestTool get(String url) throws Exception {
 		simpleCall("GET", url, null);
 		return this;
 	}
@@ -74,22 +74,22 @@ public class RestHelper {
 	 * @return This RestHelper object to be fluent
 	 * @throws Exception
 	 */
-	public RestHelper get() throws Exception {
+	public RestTool get() throws Exception {
 		get("");
 		return this;
 	}
 	
-	public RestHelper delete(String url) throws Exception {
+	public RestTool delete(String url) throws Exception {
 		simpleCall("DELETE", url, null);
 		return this;
 	}
 	
-	public RestHelper simpleCall(String method, String url, String input) throws Exception {
+	public RestTool simpleCall(String method, String url, String input) throws Exception {
 		simpleCall(method, url, "json", input);
 		return this;
 	}
 	
-	public RestHelper simpleCall(String method, String url, String inputType, String input) throws Exception {
+	public RestTool simpleCall(String method, String url, String inputType, String input) throws Exception {
 		//logger.setLevel(Level.DEBUG);
 		String realUrl = urlStart+url; 
 		
@@ -177,7 +177,7 @@ public class RestHelper {
 	/**
 	 * Set the response timeout (in milliseconds).
 	 */
-	public RestHelper setConnectTimeout(int connectTimeout) {
+	public RestTool setConnectTimeout(int connectTimeout) {
 		this.connectTimeout = connectTimeout;
 		return this;
 	}
@@ -185,7 +185,7 @@ public class RestHelper {
 	/**
 	 * Set the socket connection timeout (in milliseconds).
 	 */
-	public RestHelper setSocketTimeout(int socketTimeout) {
+	public RestTool setSocketTimeout(int socketTimeout) {
 		this.socketTimeout = socketTimeout;
 		return this;
 	}
@@ -195,7 +195,7 @@ public class RestHelper {
 	 * Attention : this is incompatible with ignoreSSLCertificatVerification().<br>
 	 * Sample creds = new org.apache.http.auth.NTCredentials("S566605", "my password", "proxy hostname", "SIEGE");
 	 */
-	public RestHelper setProxy(String hostname, int port, org.apache.http.auth.Credentials creds) {
+	public RestTool setProxy(String hostname, int port, org.apache.http.auth.Credentials creds) {
 		httpProxyHost = new HttpHost(hostname, port);
 		executor.authPreemptive(httpProxyHost);
 		if (creds != null) {
@@ -207,7 +207,7 @@ public class RestHelper {
 	/**
 	 * Set a basic authentication for the request.
 	 */
-	public RestHelper setBasicAuthentication(String basicAuthentUser, String basicAuthentPassword) {
+	public RestTool setBasicAuthentication(String basicAuthentUser, String basicAuthentPassword) {
 		this.basicAuthentUser = basicAuthentUser;
 		this.basicAuthentPassword = basicAuthentPassword;
 		return this;
@@ -216,7 +216,7 @@ public class RestHelper {
 	/**
 	 * Add a header in the request.
 	 */
-	public RestHelper addHeader(String key, String value) {
+	public RestTool addHeader(String key, String value) {
 		headers.put(key, value);
 		return this;
 	}
@@ -224,7 +224,7 @@ public class RestHelper {
 	/**
 	 * Force an entity charset.
 	 */
-	public RestHelper setEntityCharset(Charset entityCharset) {
+	public RestTool setEntityCharset(Charset entityCharset) {
 		this.entityCharset = entityCharset;
 		return this;
 	}
@@ -232,7 +232,7 @@ public class RestHelper {
 	/**
 	 * Force an entity charset.
 	 */
-	public RestHelper setEntityCharset(String entityCharsetName) {
+	public RestTool setEntityCharset(String entityCharsetName) {
 		this.entityCharset = Charset.forName(entityCharsetName);
 		return this;
 	}
@@ -241,7 +241,7 @@ public class RestHelper {
 	 * Ignore SSL certificat verification.<br>Attention : this is incompatible with setProxy().
 	 * Do not call if you use a proxy.
 	 */
-	public RestHelper ignoreSSLCertificatVerification() throws Exception {
+	public RestTool ignoreSSLCertificatVerification() throws Exception {
         SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustAllStrategy()).build();
 
         SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslcontext,

@@ -57,7 +57,6 @@ request.setAttribute("model", model);
 <html lang="fr">
 <head>
 	<%@ include file="include_head.jsp"%>
-	<script src="scripts/jqplot/plugins/jqplot.ohlcRenderer.js"></script>
 </head>
 <body>
 <%@ include file="include_top.jsp"%>

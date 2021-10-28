@@ -6,6 +6,7 @@ import static chamette.tools.CsvTools.unquote;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -34,6 +35,15 @@ public class TestVir {
 	
 	public long getPc() {
 		return Math.round((double)positifs * 100 /tests);
+	}
+	
+	/**
+	 * Récupération du dernier jour contenu dans les datas
+	 * @param context Permet d'accéder aux Datasets
+	 */
+	public static LocalDate getLastDay(javax.servlet.ServletContext context) throws Exception {
+		TreeMap<LocalDate, TestVir> cumulByDay = TestVir.cumulTestVirByDay(context, null, false);
+		return cumulByDay.lastKey();
 	}
 	
 	public static TreeMap<String, TestVir> cumulTestVirByDepLastWeek(javax.servlet.ServletContext context, LocalDate lastDay) throws Exception {
@@ -167,5 +177,32 @@ public class TestVir {
 		return ret;
 	}
 
+	/**
+	 * Calcule la variation d'incidence d'une semaine à l'autre
+	 * @param context
+	 * @param lastDay
+	 * @return
+	 * @throws Exception
+	 */
+	public static TreeMap<String, Double> getVariations(javax.servlet.ServletContext context, LocalDate lastDay) throws Exception {
+		Logger logger = Logger.getLogger("getVariation");
+
+		TreeMap<String, TestVir> lastWeek = cumulTestVirByDepLastWeek(context, lastDay);
+		TreeMap<String, TestVir> previousWeek = cumulTestVirByDepLastWeek(context, lastDay.minusDays(7));
+		
+		TreeMap<String, Double> ret = new TreeMap<String, Double>();
+		for (Map.Entry<String, TestVir> entry : lastWeek.entrySet()) {
+			if (previousWeek.get(entry.getKey()) != null) {
+				long positifWeek = entry.getValue().getPositifs();
+				long positifPrev = previousWeek.get(entry.getKey()).getPositifs();
+				double pc = 0;
+				if (positifPrev > 0) {
+					pc = 100.0D * (positifWeek - positifPrev) / positifPrev;
+				}
+				ret.put(entry.getKey(), pc);
+			}
+		}
+		return ret;
+	}
 	
 }

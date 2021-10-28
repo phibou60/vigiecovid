@@ -1,6 +1,6 @@
 package chamette.datasets;
 
-import chamette.tools.RestHelper;
+import chamette.tools.RestTool;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -58,7 +58,7 @@ public class DataGouvFrDownloader extends CommonDataset implements Downloadable 
 
 		logger.info("Look for update for file \"" + getName() + "\". Last found file is " + lastDownloaded);
 
-		RestHelper restHelper = new RestHelper("http://www.data.gouv.fr/api/1/");
+		RestTool restHelper = new RestTool("http://www.data.gouv.fr/api/1/");
 		restHelper.ignoreSSLCertificatVerification();
 		restHelper.get("datasets/" + dgDatasets);
 
@@ -79,7 +79,7 @@ public class DataGouvFrDownloader extends CommonDataset implements Downloadable 
 						lastDownloaded = resource.getString("url");
 						logger.info(" >> found update " + resource.getString("url"));
 
-						RestHelper restHelperDownload = new RestHelper(resource.getString("url"));
+						RestTool restHelperDownload = new RestTool(resource.getString("url"));
 						restHelperDownload.ignoreSSLCertificatVerification();
 						restHelperDownload.get();
 
