@@ -18,12 +18,13 @@
 	</div>
 	<br>
 
-	<label for="select_period">Selectionner une période:</label>
-	<select id="select_period" onChange="javascript:redessine();">
-		<option value="1" selected="x">Tout</option>
-		<option value="2">Deuxième vague</option>
-		<option value="3">Troisième vague</option>
-	</select>
+	<script>
+		//Intervalle complet des datas
+		var dataDateMin = "${model.dataDateMin}";
+		var dataDateMax = "${model.dataDateMax}";
+	</script>
+		
+	<%@ include file="include_period_selection.jsp"%>
 
 	<div class="row">
 		<h3 style="margin-top:20px;">Décès</h3>
@@ -107,28 +108,13 @@ var db = {};
 	db['${entry.key}'] = a;
 </c:forEach>
 
-var dataDateMin = "${model.dataDateMin}";
-var dataDateMax = "${model.dataDateMax}";
-
 function dessine() {
-
-	console.log("Début dessine: "+new Date());
-		
-	var value = $('#select_period').val();
-	setCookie('select_period', value, 0);
 	
-	console.log("dataDateMin: "+dataDateMin+", "+"dataDateMax: "+dataDateMax);
-	var dateMin = dataDateMin;
-	var dateMax = dataDateMax;
-
-	if (value == "2") {
-		dateMin = secondeVague;
-	}
-
-	if (value == "3") {
-		dateMin = troisiemeVague;
-	}
-	console.log("dateMin: "+dateMin+", "+"dateMax: "+dateMax);
+	setCookie('select_period', getPeriod(), 0);
+	
+	var dateMin = getPeriodStart();
+	var dateMax = getPeriodEnd();
+	console.log("dateMin: " + dateMin + ", dateMax: " + dateMax);
 	
 	<%@ include file="include_plot_style.jsp"%>
 	

@@ -75,20 +75,23 @@ request.setAttribute("model", model);
 	</c:choose>
 	au ${model.lastDayOfData}
 	</h2>
-	Il y a eu <span class="nombre" id="lastPositifs"></span> cas positifs dans les dernières 24h.<br>
-	Sur une semaine, il y a en moyenne <span class="nombre" id="lastPositifsSemaine"></span> cas positifs par jour.<br>
-	L'incidence est actuellement de <span class="nombre" id="lastIncid"> (cas positifs par semaine pour 100.000 personnes)</span><br>
-	<br>	
-	Sur la dernière semaine, il y a eu <span class="nombre" id="lastTestsSemaine"></span> tests effectués.<br>
-	Pour rappel : le gouvernement avait prévu de pouvoir faire 700.000 tests par semaine.
-	<br>
-	<br>		
-	<label for="select_period">Selectionner une période:</label>
-	<select id="select_period" onChange="javascript:redessine();">
-		<option value="1" selected="x">Tout</option>
-		<option value="2">Deuxième vague</option>
-		<option value="3">Troisième vague</option>
-	</select>
+	<p>
+		Il y a eu <span class="nombre" id="lastPositifs"></span> cas positifs dans les dernières 24h.<br>
+		Sur une semaine, il y a en moyenne <span class="nombre" id="lastPositifsSemaine"></span> cas positifs par jour.<br>
+		L'incidence est actuellement de <span class="nombre" id="lastIncid"> (cas positifs par semaine pour 100.000 personnes)</span>
+	</p>
+	<p>	
+		Sur la dernière semaine, il y a eu <span class="nombre" id="lastTestsSemaine"></span> tests effectués.
+	</p>
+
+	<script>
+		//Intervalle complet des datas
+		var dataDateMin = "${model.dateMin}";
+		var dataDateMax = "${model.dateMax}";
+	</script>
+		
+	<%@ include file="include_period_selection.jsp"%>
+			
 </div>
 <div class="container">
 	<div class="row">
@@ -137,19 +140,10 @@ var resizablePlots = [];
 
 function dessine() {
 
-	var value = $('#select_period').val();
-	setCookie('select_period', value, 0);
+	setCookie('select_period', getPeriod(), 0);
 	
-	var dateMin = dataDateMin;
-	var dateMax = dataDateMax;
-
-	if (value == "2") {
-		dateMin = secondeVague;
-	}
-
-	if (value == "3") {
-		dateMin = troisiemeVague;
-	}
+	var dateMin = getPeriodStart();
+	var dateMax = getPeriodEnd();
 	
 	<%@ include file="include_plot_style.jsp"%>
 

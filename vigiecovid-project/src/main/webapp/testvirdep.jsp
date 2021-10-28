@@ -89,8 +89,8 @@ request.setAttribute("model", model);
 <%@ include file="include_top.jsp"%>
 
 <script>
-var colorIncids = ["greenyellow", "#feff31", "#ffdb33", "#ffb734", "#ff9234", "#ff6933", "#fe3231", "crimson"];
-var incidLevels = [	               50,			100,		150,		250,		400,	700,		1000];
+var colorIncids = ["LimeGreen", "greenyellow", "#feff31", "#ffdb33", "#ffb734", "#ff9234", "#ff6933", "#fe3231", "crimson"];
+var incidLevels = [	              10,            50,        100,       150,       250,       400,       700,       1000];
 </script>
 
 <div class="container">
@@ -190,7 +190,6 @@ for (depId in incids) {
 }
 
 $(document).ready(function() {
-
 	for (depId in couleurs) {
 		let id = '#dep' + depId;
 		$(id).css({backgroundColor: couleurs[depId]});
@@ -212,7 +211,7 @@ $(document).ready(function() {
 			location.assign('testvirday.jsp?dep='+code+'&lib='+region);
 		},
 		onLabelShow: function(element, label, region){
-			label.html(region+" - "+labels[region]+" ("+incids[region]+")");
+			label.html(labels[region] + ": " + incids[region]);
 		}
 	});
 });

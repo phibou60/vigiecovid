@@ -81,6 +81,15 @@ request.setAttribute("model", model);
 	</c:choose>
 	au ${model.lastDayOfData}
 	</h2>
+
+	<script>
+		//Intervalle complet des datas
+		var dataDateMin = "${model.dataDateMin}";
+		var dataDateMax = "${model.dataDateMax}";
+	</script>
+		
+	<%@ include file="include_period_selection.jsp"%>
+	
 </div>
 <br>
 <div class="container">
@@ -108,12 +117,16 @@ var line_pc_acte_corona = [];
 	line_pc_acte_corona.push(['${entry.key}', ${entry.value.pc_acte_corona}]);
 </c:forEach>
 
-var dateMin = "${model.dataDateMin}";
-var dateMax = "${model.dataDateMax}";
-
-<%@ include file="include_plot_style.jsp"%>
-
 function dessine() {
+
+	setCookie('select_period', getPeriod(), 0);
+	
+	var dateMin = getPeriodStart();
+	var dateMax = getPeriodEnd();
+	console.log("dateMin: " + dateMin + ", dateMax: " + dateMax);
+	
+	<%@ include file="include_plot_style.jsp"%>
+
 	resizablePlots = [];
 
 	resizablePlots.push($.jqplot('chart_pc_pass_corona', [line_pc_pass_corona], {

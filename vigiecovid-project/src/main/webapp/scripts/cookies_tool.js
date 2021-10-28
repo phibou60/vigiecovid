@@ -1,5 +1,3 @@
-var secondeVague = "2020-10-01";
-var troisiemeVague = "2020-12-10";
 			
 function setCookie(cname, cvalue, exdays) {
 	var d = new Date();
