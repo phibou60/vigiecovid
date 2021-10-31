@@ -6,6 +6,8 @@ import java.util.TreeMap;
 import javax.servlet.ServletContext;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import chamette.datasets.CommonDataset;
 import chamette.datasets.Dataset;
@@ -17,22 +19,19 @@ import chamette.datasets.ParseException;
  * Classe permettant de faire des cumuls de données d'appel à SOS Médecins et aux passages aux urgences.  
  *
  */
+
+@Component
 public class SursaudsDAO {
 
 	private final Logger LOGGER = Logger.getLogger(SursaudsDAO.class);
+	
+	private ServletContext context;
+	
+	public SursaudsDAO(@Autowired ServletContext context) {
+		super();
+		this.context = context;
+	}
 
-	private Datasets datasets;
-	
-	public SursaudsDAO(ServletContext context) {
-		super();
-		this.datasets = (Datasets) context.getAttribute("datasets");
-	}
-	
-	public SursaudsDAO(Datasets datasets) {
-		super();
-		this.datasets = datasets;
-	}
-	
 	/**
 	 * Retourne les cumuls de Sursaud par jour.
 	 * @param context Obligatoire
@@ -42,6 +41,8 @@ public class SursaudsDAO {
 	 */
 	public TreeMap<LocalDate, Sursaud> cumulSursaudByDay(String dep) throws Exception {
 
+		Datasets datasets = (Datasets) context.getAttribute("datasets");
+		
 		String myDatasetName = "cumulSursaudByDay.dep="+dep;
 		String parentDatasetName = "sursaud-covid19-quotidien-departement";
 		
@@ -110,6 +111,8 @@ public class SursaudsDAO {
 	 */
 	public TreeMap<String, Sursaud> cumulSursaudByDep(LocalDate fromDate, LocalDate toDate) throws Exception {
 
+		Datasets datasets = (Datasets) context.getAttribute("datasets");
+		
 		String myDatasetName = "cumulSursaudByDep.fromDate="+fromDate+",toDate="+toDate;
 		String parentDatasetName = "sursaud-covid19-quotidien-departement";
 		

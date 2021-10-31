@@ -20,6 +20,7 @@
 					<a class="dropdown-item" href="app/dh-rea">Réanimations</a>
 					<a class="dropdown-item" href="app/dh-correl">Corrélations de données</a>
 					<a class="dropdown-item" href="app/dh-ages">Tranches d'ages</a>
+					<a class="dropdown-item" href="app/dh-repro">Taux de reproduction</a>
 				</div>
 			</li>
 
@@ -28,8 +29,8 @@
 				Données des urgences
 				</a>
 				<div class="dropdown-menu">
-					<a class="dropdown-item" href="sursauday.jsp">Données quotidiennes</a>
-					<a class="dropdown-item" href="sursaudep.jsp">Appels SOS Médecins par département</a>
+					<a class="dropdown-item" href="app/sursau-day">Données quotidiennes</a>
+					<a class="dropdown-item" href="app/sursau-dep">Appels SOS Médecins par département</a>
 				</div>
 			</li>
 

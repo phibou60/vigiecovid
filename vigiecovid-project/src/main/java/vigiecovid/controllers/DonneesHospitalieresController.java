@@ -29,6 +29,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import vigiecovid.domain.DonneesHospitalieres;
 import vigiecovid.domain.ServletContextWrapper;
+import vigiecovid.domain.TestVir;
 
 @Controller
 public class DonneesHospitalieresController {
@@ -404,5 +405,20 @@ public class DonneesHospitalieresController {
 		modelAndView.addObject("model", out.toString());
         return modelAndView;
 	}
-	
+
+	@GetMapping("/dh-repro")
+    public ModelAndView repro() throws Exception {
+		ModelAndView modelAndView = new ModelAndView("dh-repro");
+		
+		TreeMap<LocalDate, Double> reproductionTestVirByWeeks = 
+				TestVir.reproductionTestVirByWeeks(servletContextWrapper.getServletContext(), null, true);
+		modelAndView.addObject("reproductionTestVirByWeeks", reproductionTestVirByWeeks);
+		
+		modelAndView.addObject("dateMin", reproductionTestVirByWeeks.firstKey());
+		modelAndView.addObject("dateMax", reproductionTestVirByWeeks.lastKey());
+		
+		LOGGER.info("variationTestVirByWeeks.size(): " + reproductionTestVirByWeeks.size());
+
+		return modelAndView;
+	}
 }

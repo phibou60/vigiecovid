@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import chamette.datasets.CommonDataset;
@@ -33,12 +34,13 @@ public class TestVir {
 		return positifs;
 	}
 	
-	public long getPc() {
-		return Math.round((double)positifs * 100 /tests);
+	public double getPc() {
+		return 100D * positifs / tests;
 	}
 	
 	/**
-	 * Récupération du dernier jour contenu dans les datas
+	 * Récupération du dernier jour contenu dans les datas.
+	 * 
 	 * @param context Permet d'accéder aux Datasets
 	 */
 	public static LocalDate getLastDay(javax.servlet.ServletContext context) throws Exception {
@@ -46,6 +48,14 @@ public class TestVir {
 		return cumulByDay.lastKey();
 	}
 	
+	/**
+	 * Récupère les tests virologiques par département pour une semaine.
+	 * 
+	 * @param context Permet d'accéder aux Datasets
+	 * @param lastDay Jour de calcul
+	 * @return Un tableau par département des tests virologiques cumulés sur 7 jours
+	 * @throws Exception
+	 */
 	public static TreeMap<String, TestVir> cumulTestVirByDepLastWeek(javax.servlet.ServletContext context, LocalDate lastDay) throws Exception {
 		Logger logger = Logger.getLogger("cumulTestVirByDepLastWeek");
 
@@ -114,6 +124,15 @@ public class TestVir {
 		return ret;
 	}
 
+	/**
+	 * Retourne les tests virologiques par jour (avec possibilité de filtrer sur le département).
+	 * 
+	 * @param context Permet d'accéder aux Datasets
+	 * @param dep Département (facultatif. Peut être null)
+	 * @param metropoleSeule true indique que l'on veut uniquement les données de la métropole
+	 * @return Un tableau des tests virologiques par jour
+	 * @throws Exception
+	 */
 	public static TreeMap<LocalDate, TestVir> cumulTestVirByDay(javax.servlet.ServletContext context, String dep, boolean metropoleSeule) throws Exception {
 		Logger logger = Logger.getLogger("cumulTestVirByDay");
 
@@ -178,10 +197,72 @@ public class TestVir {
 	}
 
 	/**
-	 * Calcule la variation d'incidence d'une semaine à l'autre
-	 * @param context
-	 * @param lastDay
-	 * @return
+	 * Retourne les tests virologiques par semaine (avec possibilité de filtrer sur le département).
+	 * 
+	 * @param context Permet d'accéder aux Datasets
+	 * @param dep Département (facultatif. Peut être null)
+	 * @param metropoleSeule true indique que l'on veut uniquement les données de la métropole
+	 * @return Un tableau des tests virologiques par semaine (la journée indique le dernier jour)
+	 * @throws Exception
+	 */
+	public static TreeMap<LocalDate, TestVir> cumulTestVirByWeeks(javax.servlet.ServletContext context, String dep, boolean metropoleSeule) throws Exception {
+		
+		TreeMap<LocalDate, TestVir> byDays = cumulTestVirByDay(context, dep, metropoleSeule);
+		TreeMap<LocalDate, TestVir> ret = new TreeMap<>();
+		
+		for (Map.Entry<LocalDate, TestVir> entry : byDays.entrySet()) {
+			TestVir testVir = new TestVir(entry.getValue().positifs, entry.getValue().tests);
+			for (int i = 1; i <= 6; i++) {
+				LocalDate key = entry.getKey().minusDays(i);
+				TestVir testVirNew = byDays.get(key);
+				if (testVirNew != null) {
+					testVir.tests += testVirNew.tests;
+					testVir.positifs += testVirNew.positifs;
+				}
+			}
+			ret.put(entry.getKey(), testVir);
+		}
+		
+		return ret;
+	}
+
+	/**
+	 * Calcule le taux de variation par semaine (taux de reproduction)
+	 * (avec possibilité de filtrer sur le département).
+	 * 
+	 * @param context Permet d'accéder aux Datasets
+	 * @param dep Département (facultatif. Peut être null)
+	 * @param metropoleSeule true indique que l'on veut uniquement les données de la métropole
+	 * @return Un tableau du taux de variation d'une semaine à l'autre
+	 * @throws Exception
+	 */
+	public static TreeMap<LocalDate, Double> reproductionTestVirByWeeks(javax.servlet.ServletContext context, String dep, boolean metropoleSeule) throws Exception {
+		Logger logger = Logger.getLogger("variationTestVirByWeeks");
+		logger.setLevel(Level.DEBUG);
+		
+		TreeMap<LocalDate, TestVir> byDays = cumulTestVirByDay(context, dep, metropoleSeule);
+		TreeMap<LocalDate, Double> ret = new TreeMap<>();
+		
+		for (Map.Entry<LocalDate, TestVir> entry : byDays.entrySet()) {
+			LocalDate keyPrevWeek = entry.getKey().minusDays(7);
+			TestVir testVirPrevWeek = byDays.get(keyPrevWeek);
+			if (testVirPrevWeek != null) {
+				//double taux = ( (double) entry.getValue().getPositifs() - testVirPrevWeek.getPositifs() ) / testVirPrevWeek.getPositifs();
+				double taux = (double) entry.getValue().getPositifs() / testVirPrevWeek.getPositifs();
+				ret.put(entry.getKey(), taux);
+			}
+		}
+		
+		logger.debug("ret.size(): " + ret.size());
+		return ret;
+	}
+
+	/**
+	 * Calcule la variation d'incidence d'une semaine à l'autre par départements.
+	 * 
+	 * @param context Permet d'accéder aux Datasets
+	 * @param lastDay Jour de calcul
+	 * @return Un tableau avec en clé le numéro de département (en String) et en valeur le % de variation.
 	 * @throws Exception
 	 */
 	public static TreeMap<String, Double> getVariations(javax.servlet.ServletContext context, LocalDate lastDay) throws Exception {
@@ -190,7 +271,7 @@ public class TestVir {
 		TreeMap<String, TestVir> lastWeek = cumulTestVirByDepLastWeek(context, lastDay);
 		TreeMap<String, TestVir> previousWeek = cumulTestVirByDepLastWeek(context, lastDay.minusDays(7));
 		
-		TreeMap<String, Double> ret = new TreeMap<String, Double>();
+		TreeMap<String, Double> ret = new TreeMap<>();
 		for (Map.Entry<String, TestVir> entry : lastWeek.entrySet()) {
 			if (previousWeek.get(entry.getKey()) != null) {
 				long positifWeek = entry.getValue().getPositifs();

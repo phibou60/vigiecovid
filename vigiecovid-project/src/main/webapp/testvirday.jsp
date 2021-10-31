@@ -22,13 +22,18 @@ request.setAttribute("model", model);
 	String dep = request.getParameter("dep");
 	String lib = request.getParameter("lib");
 
-	TreeMap<LocalDate, TestVir> cumul = TestVir.cumulTestVirByDay(application, dep, true);
-	LocalDate lastDayOfData = cumul.lastKey();
-	LocalDate dateMin = cumul.firstKey().minusDays(1);
+	TreeMap<LocalDate, TestVir> byDays = TestVir.cumulTestVirByDay(application, dep, true);
+
+	LocalDate lastDayOfData = byDays.lastKey();
+	LocalDate dateMin = byDays.firstKey().minusDays(1);
 	LocalDate dateMax = lastDayOfData.plusDays(1);
 
+	// Population servant au calcul de l'incidence.
+	// C'est la population Française par défaut.
 	long population = 67000000l;
 
+	// Si le département a été reçu en paramètre, la population est alors celle qui 
+	// est prise en compte.
 	if (dep != null) {
 		Datasets datasets = (Datasets) application.getAttribute("datasets");
 
@@ -38,14 +43,23 @@ request.setAttribute("model", model);
 			population = (long) departement.get("PTOT");
 		}
 	}
+
+	// Calcul de l'évolution de l'incidence
+	TreeMap<LocalDate, TestVir> byWeeks = TestVir.cumulTestVirByWeeks(application, dep, true);
+	TreeMap<LocalDate, Integer> incidences = new TreeMap<>();
+	for (Map.Entry<LocalDate, TestVir> entry : byWeeks.entrySet()) {
+		int incidence = Math.round(100_000 * entry.getValue().getPositifs() / population);
+		incidences.put(entry.getKey(), incidence);
+	}
 	
 	//---- Alimentation du modèle
 
-	model.put("cumul", cumul);
+	model.put("byDays", byDays);
+	model.put("byWeeks", byWeeks);
+	model.put("incidences", incidences);
 	model.put("lastDayOfData", lastDayOfData);
 	model.put("dateMin", dateMin);
 	model.put("dateMax", dateMax);
-	model.put("population", population);
 }
 
 /////////////////////////////////////////////////////////////
@@ -107,27 +121,33 @@ request.setAttribute("model", model);
 
 var tests = [];
 var positifs = [];
+var pc = [];
 
-<c:forEach items="${model.cumul}" var="entry">
+<c:forEach items="${model.byDays}" var="entry">
 	tests.push(['${entry.key}', ${entry.value.tests}]);
 	positifs.push(['${entry.key}', ${entry.value.positifs}]);
+	pc.push(['${entry.key}', ${entry.value.pc}]);
 </c:forEach>
 
-var pc = [];
-for (i = 0; i < tests.length; i++) {
-	pc.push([tests[i][0], positifs[i][1]*100/tests[i][1]]);
-}
+var incidences = [];
+
+<c:forEach items="${model.incidences}" var="entry">
+	incidences.push(['${entry.key}', ${entry.value}]);
+</c:forEach>
+
+var avgPositifs = [];
+var testsSemaine = [];
+
+<c:forEach items="${model.byWeeks}" var="entry">
+	avgPositifs.push(['${entry.key}', ${entry.value.positifs}/7]);
+	testsSemaine.push(['${entry.key}', ${entry.value.tests}]);
+</c:forEach>
 	
 var testsCharts = tsCreateBarChartArray(tests);
 var positifsCharts = tsCreateBarChartArray(positifs);
 
-var population = ${model.population};
-var incid = tsSomme(positifs, 7, population/100000);
-var avgPositifs = tsMoyenneMobile(positifs, 7);
-var testsSemaine = tsSomme(tests, 7);
-
 document.getElementById('lastPositifs').innerHTML = new Intl.NumberFormat().format(positifs[positifs.length-1][1]);
-document.getElementById('lastIncid').innerHTML = new Intl.NumberFormat().format(Math.round(incid[incid.length-1][1]));
+document.getElementById('lastIncid').innerHTML = new Intl.NumberFormat().format(Math.round(incidences[incidences.length-1][1]));
 document.getElementById('lastPositifsSemaine').innerHTML = new Intl.NumberFormat().format(Math.round(avgPositifs[avgPositifs.length-1][1]));
 document.getElementById('lastTestsSemaine').innerHTML = new Intl.NumberFormat().format(testsSemaine[testsSemaine.length-1][1]);
 
@@ -148,7 +168,7 @@ function dessine() {
 
 	resizablePlots = [];
 	
-	resizablePlots.push($.jqplot("chartIncid", [selectValues(incid, dateMin, dateMax)], {
+	resizablePlots.push($.jqplot("chartIncid", [selectValues(incidences, dateMin, dateMax)], {
 		title:'Incidence', 
 		cursor:standard_cursor,
 		grid: standard_grid,

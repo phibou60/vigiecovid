@@ -1,65 +1,6 @@
 <%@ page errorPage="error.jsp" %> 
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page import="java.util.*, java.io.*, org.apache.log4j.Logger" %>
-<%@ page import="java.time.LocalDate" %>
-<%@ page import="vigiecovid.domain.sursaud.Sursaud" %>
-<%@ page import="vigiecovid.domain.sursaud.SursaudsDAO" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
-
-<%
-Logger logger = Logger.getLogger(this.getClass());
-ajoutPassage(request.getServletContext(), "sursauday");
-
-/////////////////////////////////////////////////////////////
-//////////////////// Début calcul modele ////////////////////
-/////////////////////////////////////////////////////////////
-
-Map<String, Object> model = new HashMap<>();
-request.setAttribute("model", model);
-{
-	String dep = request.getParameter("dep");
-	String lib = request.getParameter("lib");
-	
-	SursaudsDAO sursaudsDAO = new SursaudsDAO(request.getServletContext());
-
-	TreeMap<LocalDate, Sursaud> cumul = sursaudsDAO.cumulSursaudByDay(dep);
-	
-	TreeMap<String, Map> cumulByDates = new TreeMap<>(); 
-	
-	for (Map.Entry<LocalDate, Sursaud> entry : cumul.entrySet()) {
-		Map<String, Object> element = new HashMap<>();
-		Sursaud sursaud = entry.getValue();
-		
-		double pc_pass_corona = 0.0d;
-		double pc_hospit_corona = 0.0d;
-		if (sursaud.getNbrePassTot() > 0) {
-			pc_pass_corona = 100.0d * sursaud.getNbrePassCorona() / sursaud.getNbrePassTot();
-			pc_hospit_corona = 100.0d * sursaud.getNbreHospitCorona() / sursaud.getNbrePassTot();
-		}
-		element.put("pc_pass_corona", pc_pass_corona);
-		element.put("pc_hospit_corona", pc_hospit_corona);
-		
-		double pc_acte_corona = 0.0d;
-		if (sursaud.getNbreActeTot() > 0) {
-			pc_acte_corona = 100.0d * sursaud.getNbreActeCorona() / sursaud.getNbreActeTot();
-		}
-		element.put("pc_acte_corona", pc_acte_corona);
-		
-		cumulByDates.put(entry.getKey().toString(), element);
-	}
-	
-	//---- Alimentation du modèle
-
-	model.put("cumulByDates", cumulByDates);
-	model.put("lastDayOfData", cumul.lastKey().toString());
-	model.put("dataDateMin", LocalDate.parse(cumul.firstKey().toString()).minusDays(1));
-	model.put("dataDateMax", LocalDate.parse(cumul.lastKey().toString()).plusDays(1));
-}
-
-/////////////////////////////////////////////////////////////
-////////////////////  Fin calcul modele  ////////////////////
-/////////////////////////////////////////////////////////////
-%>
 
 <!doctype html>
 <html lang="fr">
@@ -67,7 +8,7 @@ request.setAttribute("model", model);
 	<%@ include file="include_head.jsp"%>
 </head>
 <body>
-	<%@ include file="include_top.jsp"%>
+	<%@ include file="include_menu.jsp"%>
 
 <div class="container">
 	<h2>Données des urgences hospitalières et de SOS médecins par jour
@@ -170,4 +111,3 @@ $(document).ready(function(){
 
 </script>
 </body>
-<%@ include file="include_trt_passages.jsp"%>

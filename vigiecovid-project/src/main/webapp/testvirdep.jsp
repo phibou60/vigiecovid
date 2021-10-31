@@ -61,7 +61,7 @@ request.setAttribute("model", model);
 	}
 	model.put("depStats", depStats);
 	
-	//---- Recherche jours précédent et suivant le jour en cours
+	//---- Recherche jours précédent et suivant le jour en cours 
 	LocalDate jourSuivant = cumulByDay.higherKey(day);
 	if (jourSuivant != null) {
 		model.put("jourSuivant", jourSuivant);
