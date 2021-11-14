@@ -236,23 +236,25 @@ public class TestVir {
 	 * @return Un tableau du taux de variation d'une semaine à l'autre
 	 * @throws Exception
 	 */
-	public static TreeMap<LocalDate, Double> reproductionTestVirByWeeks(javax.servlet.ServletContext context, String dep, boolean metropoleSeule) throws Exception {
-		Logger logger = Logger.getLogger("variationTestVirByWeeks");
-		logger.setLevel(Level.DEBUG);
-		
-		TreeMap<LocalDate, TestVir> byDays = cumulTestVirByDay(context, dep, metropoleSeule);
+	public static TreeMap<LocalDate, Double> reproductionTestVirByWeeks(javax.servlet.ServletContext context,
+			String dep, boolean metropoleSeule) throws Exception {
+		Logger logger = Logger.getLogger("reproductionTestVirByWeeks");
+		// logger.setLevel(Level.DEBUG);
+
+		TreeMap<LocalDate, TestVir> byWeeks = cumulTestVirByWeeks(context, dep, metropoleSeule);
 		TreeMap<LocalDate, Double> ret = new TreeMap<>();
-		
-		for (Map.Entry<LocalDate, TestVir> entry : byDays.entrySet()) {
+
+		for (Map.Entry<LocalDate, TestVir> entry : byWeeks.entrySet()) {
 			LocalDate keyPrevWeek = entry.getKey().minusDays(7);
-			TestVir testVirPrevWeek = byDays.get(keyPrevWeek);
+			TestVir testVirPrevWeek = byWeeks.get(keyPrevWeek);
 			if (testVirPrevWeek != null) {
-				//double taux = ( (double) entry.getValue().getPositifs() - testVirPrevWeek.getPositifs() ) / testVirPrevWeek.getPositifs();
 				double taux = (double) entry.getValue().getPositifs() / testVirPrevWeek.getPositifs();
 				ret.put(entry.getKey(), taux);
+				logger.debug(keyPrevWeek + ": " + testVirPrevWeek.getPositifs() + " / " + entry.getKey() + ": "
+						+ entry.getValue().getPositifs() + " = " + taux);
 			}
 		}
-		
+
 		logger.debug("ret.size(): " + ret.size());
 		return ret;
 	}
@@ -265,8 +267,9 @@ public class TestVir {
 	 * @return Un tableau avec en clé le numéro de département (en String) et en valeur le % de variation.
 	 * @throws Exception
 	 */
-	public static TreeMap<String, Double> getVariations(javax.servlet.ServletContext context, LocalDate lastDay) throws Exception {
-		Logger logger = Logger.getLogger("getVariation");
+	public static TreeMap<String, Double> getVariations(javax.servlet.ServletContext context,
+			LocalDate lastDay) throws Exception {
+		Logger logger = Logger.getLogger("getVariations");
 
 		TreeMap<String, TestVir> lastWeek = cumulTestVirByDepLastWeek(context, lastDay);
 		TreeMap<String, TestVir> previousWeek = cumulTestVirByDepLastWeek(context, lastDay.minusDays(7));

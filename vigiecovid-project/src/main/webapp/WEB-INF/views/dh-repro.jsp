@@ -33,10 +33,10 @@
 </div>
 
 <script>
-var reproductionTestVirByWeeks = [];
-<c:forEach items="${reproductionTestVirByWeeks}" var="entry">
-    reproductionTestVirByWeeks.push(['${entry.key}', ${entry.value}]);
-</c:forEach>
+var reproductionTestVirByWeeks = [<
+	c:forEach items="${reproductionTestVirByWeeks}" var="entry" varStatus="loop"
+		>['${entry.key}', ${entry.value}]<c:if test="${not loop.last}">,</c:if
+	></c:forEach>];
 
 var resizablePlots = [];
 
@@ -51,8 +51,9 @@ function dessine() {
 	<%@ include file="include_plot_style.jsp"%>
 	
 	resizablePlots = [];
+	var reproSelected = selectValues(reproductionTestVirByWeeks, dateMin, dateMax)
 	
-	resizablePlots.push($.jqplot("chart1", [selectValues(reproductionTestVirByWeeks, dateMin, dateMax)], {
+	resizablePlots.push($.jqplot("chart1", [reproSelected], {
 		title:'A partir des tests positifs', 
 		cursor:{zoom:true, looseZoom: true},
 		grid: standard_grid,
@@ -68,7 +69,7 @@ function dessine() {
 				min:0,
 				max:4,
 				rendererOptions: {forceTickAt0: true},
-				tickOptions: { formatString: "%'f" }
+				tickOptions: { formatString: '%.2f' }
 			}
 		},
 		series: [

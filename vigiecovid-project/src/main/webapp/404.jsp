@@ -9,10 +9,15 @@
 
 <div class="container">
 	<div class="row">
-		<div class="col-xl">
+	  <div class="col-xl">
 		<h2>404 : Page inconnue</h2>
-		La page que vous demandez a peut être été renommée.
-		</div>
+		<p>
+			La page que vous demandez a peut être été renommée.
+		</p>
+		<p>
+			<a href="<%=request.getServletContext().getContextPath() %>">HOME</a>
+		</p>
+	  </div>
 	</div>
 </div>
 </body>
