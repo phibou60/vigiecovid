@@ -34,6 +34,7 @@
 	<script src="../modules/jqplot/plugins/jqplot.highlighter.js"></script>
 	<script src="../modules/jqplot/plugins/jqplot.barRenderer.js"></script>
 	<script src="../modules/jqplot/plugins/jqplot.ohlcRenderer.js"></script>
+	<script src="../modules/jqplot/plugins/jqplot.canvasOverlay.js"></script>
 	<link  href="../modules/jqplot/jquery.jqplot.min.css" rel="stylesheet">
 	
 	<!-- Site style -->

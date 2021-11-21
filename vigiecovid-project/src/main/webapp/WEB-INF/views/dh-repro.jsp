@@ -19,8 +19,8 @@
 		Ici, le calcul se fait à partir des chiffres d'incidence.
 		</p>
 		<p>
-		Données du <span class="badge badge-primary">${dateMax}</span>
-		Taux de reproduction actuel :
+		Dernières données <span class="badge badge-primary">${dateMax}</span>
+		Taux de reproduction :
 		<span class="badge badge-primary" id="lastRepro"></span>
 		</p> 
 		</div>
@@ -63,37 +63,19 @@ function dessine() {
 	resizablePlots = [];
 	var reproSelected = selectValues(reproductionTestVirByWeeks, dateMin, dateMax)
 	
+	const axes = {...standard_axes};
+	axes.xaxis.min = tsAddDays(dateMin, -1);
+	axes.xaxis.max = tsAddDays(dateMax, 1);
+	axes.yaxis.min = 0;
+	axes.yaxis.max = 3;
+	axes.yaxis.tickInterval = 0.5;
+	axes.yaxis.tickOptions = { formatString: '%.2f' }
+					
 	resizablePlots.push($.jqplot("chart1", [reproSelected], {
-		cursor: {zoom:true, looseZoom: true},
+		cursor: standard_cursor,
 		grid: standard_grid,
-		axes:{
-			xaxis:{
-				renderer: $.jqplot.DateAxisRenderer,
-				tickOptions: {formatString: "%Y/%#m/%#d"},
-		    pad: 1.01,
-				drawMajorGridlines : false,
-			},
-			yaxis:{
-				min: 0,
-				max: 3,
-				drawMajorGridlines: true,
-			  drawMinorGridlines: false,
-				tickInterval: 0.5,
-				rendererOptions: {forceTickAt0: true},
-				tickOptions: { formatString: '%.2f' }
-			}
-		},
-		series: [
-			{
-				lineWidth:2,
-				markerOptions:{style:'circle', size:2},
-				pointLabels: {show: false},
-				label: 'A partir des tests positifs',
-				pointLabels: {
-			    show: true
-				}
-			}
-		],
+		axes: axes,
+		series: [standard_line_series],
 	  canvasOverlay: {
 	    show: true,
 	    objects: [
@@ -101,7 +83,7 @@ function dessine() {
 	    	  horizontalLine: {
 		         name: 'Limite',
 	           y: 1.0,
-	           lineWidth: 6,
+	           lineWidth: 5,
 	           color: 'red',
 	           shadow: false
 		      }

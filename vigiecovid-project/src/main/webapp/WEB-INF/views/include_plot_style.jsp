@@ -7,8 +7,8 @@ $.jqplot.sprintf.decimalMark = ',';
 	
 var standard_grid = {
 	background : 'white',
-	borderColor : '#a9cce3',
-	gridLineColor : '#a9cce3',
+	borderColor : 'silver',
+	gridLineColor : 'silver',
 	shadow: false
 };
 var standard_axes = {
@@ -17,7 +17,7 @@ var standard_axes = {
 		tickOptions:{formatString:"%Y/%#m/%#d"},
 		min:dateMin,
 		max:dateMax,
-		drawMajorGridlines : false,
+		drawMajorGridlines : true,
 	},
 	yaxis:{
 		min:0,
