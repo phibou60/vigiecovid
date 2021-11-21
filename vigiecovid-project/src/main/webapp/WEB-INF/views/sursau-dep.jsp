@@ -85,4 +85,5 @@ $(document).ready(function() {
 	});
 });
 </script>
+<%@ include file="include_footer.jsp"%>
 </body>

@@ -1,95 +1,19 @@
-<%@ page errorPage="error.jsp" %> 
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page import="java.util.*, java.io.*, org.apache.log4j.Logger" %>
-<%@ page import="java.time.LocalDate" %>
-<%@ page import="vigiecovid.domain.TestVir" %>
-<%@ page import="chamette.datasets.Datasets" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt_rt" %>
-
-<%
-Logger logger = Logger.getLogger(this.getClass());
-ajoutPassage(request.getServletContext(), "testvirdep");
-
-/////////////////////////////////////////////////////////////
-//////////////////// Début calcul modele ////////////////////
-/////////////////////////////////////////////////////////////
-
-Map<String, Object> model = new HashMap<>();
-request.setAttribute("model", model);
-{
-	LocalDate day = null;
-	if (request.getParameter("day") != null) {
-		day = LocalDate.parse(request.getParameter("day"));
-	}
-
-	TreeMap<LocalDate, TestVir> cumulByDay = TestVir.cumulTestVirByDay(request.getServletContext(), null, false);
-	model.put("cumulByDay", cumulByDay);
-	
-	if (day == null) {
-		day = cumulByDay.lastKey();
-	}
-	model.put("day", day);
-	
-	TreeMap<String, Double> variations = TestVir.getVariations(request.getServletContext(), day);
-	model.put("variations", variations);
-	
-	TestVir testVir = cumulByDay.get(day);
-	model.put("testVir", testVir);
-	//model.put("incid", Math.round(((double)testVir.getPositifs() * 100) / testVir.getTests()));
-	
-	TreeMap<String, TestVir> cumulTestVirByDepLastWeek = TestVir.cumulTestVirByDepLastWeek(request.getServletContext(), day);
-	Datasets datasets = (Datasets) application.getAttribute("datasets");
-	HashMap<String, HashMap> departements = (HashMap<String, HashMap>) datasets.get("departements").getData();
-	
-	TreeMap<String, Map> depStats = new TreeMap<>(); 
-	
-	for (Map.Entry<String, TestVir> entry : cumulTestVirByDepLastWeek.entrySet()) {
-		Map<String, Object> dep = new HashMap<>();
-
-		dep.put("tests", entry.getValue().getTests());
-		dep.put("positifs",	entry.getValue().getPositifs());
-		dep.put("pc", entry.getValue().getPc());
-		
-		if (departements.containsKey(entry.getKey())) {
-			Map<String, Object> departement = departements.get(entry.getKey());
-			dep.put("lib", departement.get("DEP"));
-			long population = (Long) departement.get("PTOT");
-			dep.put("incid", Math.round((double) entry.getValue().getPositifs() * 100_000 / population));
-			depStats.put(entry.getKey(), dep);
-		}
-	}
-	model.put("depStats", depStats);
-	
-	//---- Recherche jours précédent et suivant le jour en cours 
-	LocalDate jourSuivant = cumulByDay.higherKey(day);
-	if (jourSuivant != null) {
-		model.put("jourSuivant", jourSuivant);
-	}
-	LocalDate jourPrec = cumulByDay.lowerKey(day);
-	if (jourPrec != null) {
-		model.put("jourPrec", jourPrec);
-	}
-	
-}
-
-/////////////////////////////////////////////////////////////
-////////////////////  Fin calcul modele  ////////////////////
-/////////////////////////////////////////////////////////////
-%>
 
 <!doctype html>
 <html lang="fr">
 <head>
 	<%@ include file="include_head.jsp"%>
 
-    <link href="modules/france_departements/jqvmap.css" media="screen" rel="stylesheet" type="text/css" />
-	<script src="modules/france_departements/jquery.vmap.js" type="text/javascript"></script>
-    <script src="modules/france_departements/jquery.vmap.france.js" type="text/javascript"></script>
+  <link href="../modules/france_departements/jqvmap.css" media="screen" rel="stylesheet" type="text/css" />
+	<script src="../modules/france_departements/jquery.vmap.js" type="text/javascript"></script>
+  <script src="../modules/france_departements/jquery.vmap.france.js" type="text/javascript"></script>
 	
 </head>
 <body>
-<%@ include file="include_top.jsp"%>
+<%@ include file="include_menu.jsp"%>
 
 <div class="container">
 
@@ -105,18 +29,18 @@ request.setAttribute("model", model);
 		<div class="col-sm">		
 		<c:choose>
 			<c:when test="${not empty model.jourPrec}">
-				<a href="testvirdep.jsp?day=${model.jourPrec}">&lt;&lt;</a>
+				<a href="testvir-dep?day=${model.jourPrec}">&lt;&lt;</a>
 			</c:when>
 		</c:choose>
 		${model.day}
 		<c:choose>
 			<c:when test="${not empty model.jourSuivant}">
-				<a href="testvirdep.jsp?day=${model.jourSuivant}">&gt;&gt;</a>
+				<a href="testvir-dep?day=${model.jourSuivant}">&gt;&gt;</a>
 			</c:when>
 		</c:choose>
 		</div>
 		<div class="col-sm">
-		<form action="testvirdep.jsp" metyhod="get">
+		<form action="testvir-dep" metyhod="get">
 		<select class="form-select" name="day" onchange="this.form.submit()">
 		  <option selected>Selection d'une journée</option>
 			<c:forEach items="${model.cumulByDay}" var="entry">
@@ -262,7 +186,7 @@ $(document).ready(function() {
 		enableZoom: false,
 		showTooltip: true,
 		onRegionClick: function(element, code, region) {
-			location.assign('testvirday.jsp?dep='+code+'&lib='+region);
+			location.assign('testvir-day?dep='+code+'&lib='+region);
 		},
 		onLabelShow: function(element, label, region){
 			label.html(labels[region] + ": " + incids[region]);
@@ -281,7 +205,7 @@ $(document).ready(function() {
 		enableZoom: false,
 		showTooltip: true,
 		onRegionClick: function(element, code, region) {
-			location.assign('testvirday.jsp?dep='+code+'&lib='+region);
+			location.assign('testvir-day?dep='+code+'&lib='+region);
 		},
 		onLabelShow: function(element, label, region){
 			label.html(labels[region] + ": " + pcFormateur.format(variations[region]) + "%");
@@ -290,5 +214,5 @@ $(document).ready(function() {
 	
 });
 </script>
+<%@ include file="include_footer.jsp"%>
 </body>
-<%@ include file="include_trt_passages.jsp"%>

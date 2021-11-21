@@ -1,79 +1,14 @@
-<%@ page errorPage="error.jsp" %> 
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page import="java.util.*, java.io.*, org.apache.log4j.Logger" %>
-<%@ page import="java.time.LocalDate" %>
-<%@ page import="org.apache.commons.math3.stat.StatUtils" %>
-<%@ page import="vigiecovid.domain.TestVir" %>
-<%@ page import="chamette.datasets.Datasets" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt_rt" %>
-
-<%
-Logger logger = Logger.getLogger(this.getClass());
-ajoutPassage(request.getServletContext(), "testvirday");
-
-/////////////////////////////////////////////////////////////
-//////////////////// Début calcul modele ////////////////////
-/////////////////////////////////////////////////////////////
-
-Map<String, Object> model = new HashMap<>();
-request.setAttribute("model", model);
-{
-	String dep = request.getParameter("dep");
-	String lib = request.getParameter("lib");
-
-	TreeMap<LocalDate, TestVir> byDays = TestVir.cumulTestVirByDay(application, dep, true);
-
-	LocalDate lastDayOfData = byDays.lastKey();
-	LocalDate dateMin = byDays.firstKey().minusDays(1);
-	LocalDate dateMax = lastDayOfData.plusDays(1);
-
-	// Population servant au calcul de l'incidence.
-	// C'est la population Française par défaut.
-	long population = 67000000l;
-
-	// Si le département a été reçu en paramètre, la population est alors celle qui 
-	// est prise en compte.
-	if (dep != null) {
-		Datasets datasets = (Datasets) application.getAttribute("datasets");
-
-		HashMap<String, HashMap> departements = (HashMap<String, HashMap>) datasets.get("departements").getData();
-		if (departements.get(dep) != null) {
-			HashMap<String, Object> departement = (HashMap<String, Object>) departements.get(dep);
-			population = (long) departement.get("PTOT");
-		}
-	}
-
-	// Calcul de l'évolution de l'incidence
-	TreeMap<LocalDate, TestVir> byWeeks = TestVir.cumulTestVirByWeeks(application, dep, true);
-	TreeMap<LocalDate, Integer> incidences = new TreeMap<>();
-	for (Map.Entry<LocalDate, TestVir> entry : byWeeks.entrySet()) {
-		int incidence = Math.round(100_000 * entry.getValue().getPositifs() / population);
-		incidences.put(entry.getKey(), incidence);
-	}
-	
-	//---- Alimentation du modèle
-
-	model.put("byDays", byDays);
-	model.put("byWeeks", byWeeks);
-	model.put("incidences", incidences);
-	model.put("lastDayOfData", lastDayOfData);
-	model.put("dateMin", dateMin);
-	model.put("dateMax", dateMax);
-}
-
-/////////////////////////////////////////////////////////////
-////////////////////  Fin calcul modele  ////////////////////
-/////////////////////////////////////////////////////////////
-%>
-
 <!doctype html>
+
 <html lang="fr">
 <head>
 	<%@ include file="include_head.jsp"%>
 </head>
 <body>
-<%@ include file="include_top.jsp"%>
+<%@ include file="include_menu.jsp"%>
 
 <div class="container">
 
@@ -282,5 +217,5 @@ $(document).ready(function(){
 })
 
 </script>
+<%@ include file="include_footer.jsp"%>
 </body>
-<%@ include file="include_trt_passages.jsp"%>

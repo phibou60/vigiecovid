@@ -14,7 +14,15 @@
 	<div class="row">
 		<div class="col-xl">
 		<h3>Taux de reproduction (R0)</h3>
-		Le principe est simplement de faire le ratio de cas d'une semaine à l'autre. 
+		<p>
+		Le principe est simplement de faire le ratio de cas d'une semaine à l'autre.<br>
+		Ici, le calcul se fait à partir des chiffres d'incidence.
+		</p>
+		<p>
+		Données du <span class="badge badge-primary">${dateMax}</span>
+		Taux de reproduction actuel :
+		<span class="badge badge-primary" id="lastRepro"></span>
+		</p> 
 		</div>
 	</div>
 	<br>
@@ -28,15 +36,17 @@
 	<%@ include file="include_period_selection.jsp"%>
 
 	<div class="row">
-		<div class="col-xl tuile"><div id="chart1"></div></div>
+		<div class="col-xl tuile"><div id="chart1" style="height:400px"></div></div>
 	</div>
 </div>
 
 <script>
-var reproductionTestVirByWeeks = [<
-	c:forEach items="${reproductionTestVirByWeeks}" var="entry" varStatus="loop"
-		>['${entry.key}', ${entry.value}]<c:if test="${not loop.last}">,</c:if
-	></c:forEach>];
+var reproductionTestVirByWeeks = [
+<c:forEach items="${reproductionTestVirByWeeks}" var="entry" varStatus="loop">['${entry.key}', ${entry.value}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+
+let lastRepro = reproductionTestVirByWeeks[reproductionTestVirByWeeks.length-1][1];
+let lastReproS = new Intl.NumberFormat().format(lastRepro);
+document.querySelector("#lastRepro").innerHTML =lastReproS;
 
 var resizablePlots = [];
 
@@ -54,20 +64,21 @@ function dessine() {
 	var reproSelected = selectValues(reproductionTestVirByWeeks, dateMin, dateMax)
 	
 	resizablePlots.push($.jqplot("chart1", [reproSelected], {
-		title:'A partir des tests positifs', 
-		cursor:{zoom:true, looseZoom: true},
+		cursor: {zoom:true, looseZoom: true},
 		grid: standard_grid,
 		axes:{
 			xaxis:{
-				renderer:$.jqplot.DateAxisRenderer,
-				tickOptions:{formatString:"%Y/%#m/%#d"},
-				min:dateMin,
-				max:dateMax,
+				renderer: $.jqplot.DateAxisRenderer,
+				tickOptions: {formatString: "%Y/%#m/%#d"},
+		    pad: 1.01,
 				drawMajorGridlines : false,
 			},
 			yaxis:{
-				min:0,
-				max:4,
+				min: 0,
+				max: 3,
+				drawMajorGridlines: true,
+			  drawMinorGridlines: false,
+				tickInterval: 0.5,
 				rendererOptions: {forceTickAt0: true},
 				tickOptions: { formatString: '%.2f' }
 			}
@@ -78,9 +89,24 @@ function dessine() {
 				markerOptions:{style:'circle', size:2},
 				pointLabels: {show: false},
 				label: 'A partir des tests positifs',
-				color: 'red'
+				pointLabels: {
+			    show: true
+				}
 			}
 		],
+	  canvasOverlay: {
+	    show: true,
+	    objects: [
+	      {
+	    	  horizontalLine: {
+		         name: 'Limite',
+	           y: 1.0,
+	           lineWidth: 6,
+	           color: 'red',
+	           shadow: false
+		      }
+	      }],		
+	  }
 	}));
 
 }
@@ -106,4 +132,5 @@ $(document).ready(function(){
 });
 
 </script>
+<%@ include file="include_footer.jsp"%>
 </body>
