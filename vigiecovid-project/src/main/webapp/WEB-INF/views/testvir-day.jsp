@@ -44,40 +44,29 @@
 <div class="container">
 	<div class="row">
 		<div class="col-xl tuile"><div id="chartIncid"></div></div>
-		<div class="col-xl tuile"><div id="chartPos"></div></div>
+		<div class="col-xl tuile"><div id="chartProj"></div></div>
 	</div>
 	<div class="row">
+		<div class="col-xl tuile"><div id="chartPos"></div></div>
 		<div class="col-xl tuile"><div id="chartReal"></div></div>
-		<div class="col-xl tuile"><div id="chart4"></div></div>
 	</div>
+  <div class="row">
+    <div class="col-xl tuile"><div id="chart4"></div></div>
+    <div class="col-xl tuile"><div id="chart5"></div></div>
+  </div>
 </div>
 
 <script>
 
-var tests = [];
-var positifs = [];
-var pc = [];
+var tests = [<c:forEach items="${model.byDays}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.tests}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var positifs = [<c:forEach items="${model.byDays}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.positifs}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var pc = [<c:forEach items="${model.byDays}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.pc}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
 
-<c:forEach items="${model.byDays}" var="entry">
-	tests.push(['${entry.key}', ${entry.value.tests}]);
-	positifs.push(['${entry.key}', ${entry.value.positifs}]);
-	pc.push(['${entry.key}', ${entry.value.pc}]);
-</c:forEach>
+var avgPositifs = [<c:forEach items="${model.byWeeks}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.positifs}/7]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var testsSemaine = [<c:forEach items="${model.byWeeks}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.tests}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var incidences = [<c:forEach items="${model.incidences}" var="entry" varStatus="loop">['${entry.key}', ${entry.value}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var projection = [<c:forEach items="${model.proj}" var="entry" varStatus="loop">['${entry.key}', ${entry.value}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
 
-var incidences = [];
-
-<c:forEach items="${model.incidences}" var="entry">
-	incidences.push(['${entry.key}', ${entry.value}]);
-</c:forEach>
-
-var avgPositifs = [];
-var testsSemaine = [];
-
-<c:forEach items="${model.byWeeks}" var="entry">
-	avgPositifs.push(['${entry.key}', ${entry.value.positifs}/7]);
-	testsSemaine.push(['${entry.key}', ${entry.value.tests}]);
-</c:forEach>
-	
 var testsCharts = tsCreateBarChartArray(tests);
 var positifsCharts = tsCreateBarChartArray(positifs);
 
@@ -86,9 +75,9 @@ document.getElementById('lastIncid').innerHTML = new Intl.NumberFormat().format(
 document.getElementById('lastPositifsSemaine').innerHTML = new Intl.NumberFormat().format(Math.round(avgPositifs[avgPositifs.length-1][1]));
 document.getElementById('lastTestsSemaine').innerHTML = new Intl.NumberFormat().format(testsSemaine[testsSemaine.length-1][1]);
 
-//Intervalle complet des datas
-var dataDateMin = "${model.dateMin}";
-var dataDateMax = "${model.dateMax}";
+//Projection
+var dateMinProj = projection[0][0];
+var dateMaxProj = projection[projection.length - 1][0];
 
 var resizablePlots = [];
 
@@ -108,6 +97,7 @@ function dessine() {
 		cursor:standard_cursor,
 		grid: standard_grid,
 		axes: standard_axes,
+		seriesDefaults: standard_seriesDefaults,
 		series: [
 			{
 				lineWidth:2,
@@ -122,6 +112,7 @@ function dessine() {
 		title:'Tests quotidien et % de retours positifs', 
 		cursor:standard_cursor,
 		grid: standard_grid,
+		seriesDefaults: standard_seriesDefaults,
 		axes: {
 			xaxis:{
 				renderer:$.jqplot.DateAxisRenderer,
@@ -168,6 +159,7 @@ function dessine() {
 		cursor:standard_cursor,
 		grid: standard_grid,
 		axes: standard_axes,
+		seriesDefaults: standard_seriesDefaults,
 		series: [
 			{
 				renderer:$.jqplot.OHLCRenderer,
@@ -190,9 +182,34 @@ function dessine() {
 		title:'Tests par semaine', 
 		cursor:standard_cursor,
 		axes:standard_axes,
+		seriesDefaults: standard_seriesDefaults,
 		series:[standard_line_series],
 		grid: standard_grid
 	}));
+	
+	let projFrom = new Date(tsAddDays(dateMax, -62)).toISOString().split('T')[0];
+	
+  resizablePlots.push($.jqplot('chartProj',
+		  [selectValues(incidences, projFrom, dateMax), projection], {
+    title:'Tendance', 
+    cursor:standard_cursor,
+    axes:{
+      xaxis:{
+        renderer:$.jqplot.DateAxisRenderer,
+        tickOptions:{formatString:"%Y/%#m/%#d"},
+      //  min:dateMinProj,
+        max:dateMaxProj
+      },
+      yaxis:{
+        min:0,
+        rendererOptions: {forceTickAt0: true},        
+        tickOptions: { formatString: "%'i" }
+      }
+    },
+    seriesDefaults: standard_seriesDefaults,
+    series:[standard_line_series, standard_line_series],
+    grid: standard_grid
+  }));
 
 }
 

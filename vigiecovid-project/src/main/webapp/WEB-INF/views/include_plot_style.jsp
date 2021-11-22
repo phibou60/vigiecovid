@@ -36,10 +36,8 @@ var standard_axes = {
 };
 
 var standard_line_series = {
-	lineWidth:1,
-	markerOptions:{style:'circle', size:2},
-	shadowOffset: 10
-
+	lineWidth: 2,
+	markerOptions: {style: 'circle', size: 2}
 };
 
 var standard_stock_series = {
@@ -49,7 +47,8 @@ var standard_stock_series = {
 
 var standard_seriesDefaults = {
 	shadow: false,
-	markerOptions:{shadow: false}
+	markerOptions: {shadow: false},
+  pointLabels: {show: false}
 };
 
 var	standard_legend = {

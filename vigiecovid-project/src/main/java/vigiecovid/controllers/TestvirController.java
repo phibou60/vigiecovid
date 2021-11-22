@@ -15,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 import vigiecovid.domain.DepartementsDAO;
 import vigiecovid.domain.testvir.TestVir;
 import vigiecovid.domain.testvir.TestVirDAO;
+import vigiecovid.domain.testvir.TestVirTools;
 
 @Controller
 public class TestvirController {
@@ -56,18 +57,20 @@ public class TestvirController {
 		}
 	
 		// Calcul de l'évolution de l'incidence
+		
 		TreeMap<LocalDate, TestVir> byWeeks = testVirDAO.cumulTestVirByWeeks(dep, true);
-		TreeMap<LocalDate, Integer> incidences = new TreeMap<>();
-		for (Map.Entry<LocalDate, TestVir> entry : byWeeks.entrySet()) {
-			int incidence = Math.round(100_000 * entry.getValue().getPositifs() / population);
-			incidences.put(entry.getKey(), incidence);
-		}
+		TreeMap<LocalDate, Integer> incidences
+				= TestVirTools.calculEvolIncidence(byWeeks, population);
+		
+		TreeMap<LocalDate, Double> proj
+				= TestVirTools.calculPolynomialProjectionlIncidence(incidences);
 		
 		//---- Alimentation du modèle
 	
 		model.put("byDays", byDays);
 		model.put("byWeeks", byWeeks);
 		model.put("incidences", incidences);
+		model.put("proj", proj);
 		model.put("lastDayOfData", lastDayOfData);
 		model.put("dateMin", dateMin);
 		model.put("dateMax", dateMax);
@@ -77,7 +80,7 @@ public class TestvirController {
     }
 	
 	@GetMapping("/testvir-dep")
-    public ModelAndView day(@RequestParam(value="day", required=false) String paramDay) throws Exception {
+    public ModelAndView dep(@RequestParam(value="day", required=false) String paramDay) throws Exception {
 		ModelAndView modelAndView = new ModelAndView("testvir-dep");
 
 		Logger logger = Logger.getLogger(this.getClass());

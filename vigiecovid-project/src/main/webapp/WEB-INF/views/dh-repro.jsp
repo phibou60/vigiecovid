@@ -75,6 +75,7 @@ function dessine() {
 		cursor: standard_cursor,
 		grid: standard_grid,
 		axes: axes,
+		seriesDefaults: standard_seriesDefaults,
 		series: [standard_line_series],
 	  canvasOverlay: {
 	    show: true,
