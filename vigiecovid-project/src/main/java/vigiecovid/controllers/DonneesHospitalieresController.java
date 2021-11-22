@@ -27,15 +27,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import vigiecovid.domain.DepartementsDAO;
 import vigiecovid.domain.DonneesHospitalieres;
 import vigiecovid.domain.ServletContextWrapper;
-import vigiecovid.domain.TestVir;
+import vigiecovid.domain.testvir.TestVirDAO;
 
 @Controller
 public class DonneesHospitalieresController {
 
 	@Autowired
 	private ServletContextWrapper servletContextWrapper;	
+
+	@Autowired
+	private TestVirDAO testVirDAO;
 	
 	private static final Logger LOGGER = Logger.getLogger(DonneesHospitalieresController.class);
 
@@ -411,7 +415,7 @@ public class DonneesHospitalieresController {
 		ModelAndView modelAndView = new ModelAndView("dh-repro");
 		
 		TreeMap<LocalDate, Double> reproductionTestVirByWeeks = 
-				TestVir.reproductionTestVirByWeeks(servletContextWrapper.getServletContext(), null, true);
+				testVirDAO.reproductionTestVirByWeeks(null, true);
 		modelAndView.addObject("reproductionTestVirByWeeks", reproductionTestVirByWeeks);
 		
 		modelAndView.addObject("dateMin", reproductionTestVirByWeeks.firstKey());

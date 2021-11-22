@@ -8,7 +8,7 @@ body {
 .tuile {
 	margin: 10px;
 	background-color: white;
-	border : solid thin silver;
+	border : solid thin white;
 }
 
 .tuile div {

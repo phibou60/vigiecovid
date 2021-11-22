@@ -1,18 +1,21 @@
-package chamette.datasets.predef;
+package vigiecovid.domain;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
-import chamette.datasets.CommonDataset;
+import org.springframework.stereotype.Component;
 
-public class DepartementsDataset extends CommonDataset { 
+@Component
+public class DepartementsDAO { 
 
-	public DepartementsDataset() throws Exception {
-		super("departements");
+	private Map<String, HashMap> departements;
+	
+	public DepartementsDAO() throws Exception {
 		load();
 	}
 	
-	public boolean load() throws Exception {
+	public void load() {
 		
 		//CODDEP;DEP;NBARR;NBCAN;NBCOM;PMUN;PTOT;
 		// NBARR = Nb d'arrondissements
@@ -123,7 +126,7 @@ public class DepartementsDataset extends CommonDataset {
 		datasets.add("974;La Réunion;4;25;24;853659;863063;");
 		datasets.add("976;Mayotte;1;13;17;256518;256518;");
 
-		HashMap<String, HashMap> departements = new HashMap<String, HashMap>();
+		departements = new HashMap<String, HashMap>();
 		for (String line: datasets) {
 			HashMap<String, Object> departement = new HashMap<String, Object>();
 			String[] splits = line.split(";");
@@ -137,10 +140,10 @@ public class DepartementsDataset extends CommonDataset {
 			departements.put(splits[0], departement);
 		}
 		
-		setData(departements);
-		
-		return true;
-		
+	}
+
+	public Map<String, HashMap> getDepartements() {
+		return departements;
 	}
 
 }

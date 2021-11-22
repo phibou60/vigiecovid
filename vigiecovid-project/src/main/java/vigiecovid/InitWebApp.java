@@ -9,16 +9,10 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-
-import org.apache.log4j.Appender;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 
 import chamette.datasets.DataGouvFrDownloader;
 import chamette.datasets.Datasets;
-import chamette.datasets.predef.DepartementsDataset;
 
 public class InitWebApp extends HttpServlet { 
     
@@ -100,9 +94,6 @@ public class InitWebApp extends HttpServlet {
 	
 		datasets.add(new DataGouvFrDownloader("vacsi-a-fra", "6010206e7aa742eb447930f7",
 				"54dd5f8d-1e2e-4ccb-8fb8-eac68245befd", mode, folder));
-	
-		//datasets.add(new SursaudsDownloader(mode, folder));
-		datasets.add(new DepartementsDataset());
 		
 		datasets.startRefreshEngine();
 		

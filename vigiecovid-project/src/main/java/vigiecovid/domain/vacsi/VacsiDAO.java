@@ -24,7 +24,7 @@ public class VacsiDAO {
 	
 	public VacsiDAO(@Autowired ServletContext context) {
 		super();
-		LOGGER.info("Instanciate with "+context);
+		LOGGER.info("Instanciate with context: "+context);
 		this.context = context;
 	}
 	

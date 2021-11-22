@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.servlet.ServletContext;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,27 +12,29 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import chamette.datasets.Datasets;
-import vigiecovid.domain.ServletContextWrapper;
-import vigiecovid.domain.TestVir;
+import vigiecovid.domain.DepartementsDAO;
+import vigiecovid.domain.testvir.TestVir;
+import vigiecovid.domain.testvir.TestVirDAO;
 
 @Controller
 public class TestvirController {
 
 	@Autowired
-	private ServletContextWrapper servletContextWrapper;	
+	private TestVirDAO testVirDAO;	
+
+	@Autowired
+	private DepartementsDAO departementsDAO;	
 
 	@GetMapping("/testvir-day")
     public ModelAndView day(@RequestParam(value="dep", required=false) String dep,
     		@RequestParam(value="lib", required=false) String lib) throws Exception {
 		ModelAndView modelAndView = new ModelAndView("testvir-day");
-		ServletContext application = servletContextWrapper.getServletContext();
 
 		Logger logger = Logger.getLogger(this.getClass());
 		
 		Map<String, Object> model = new HashMap<>();
 	
-		TreeMap<LocalDate, TestVir> byDays = TestVir.cumulTestVirByDay(application, dep, true);
+		TreeMap<LocalDate, TestVir> byDays = testVirDAO.cumulTestVirByDay(dep, true);
 	
 		LocalDate lastDayOfData = byDays.lastKey();
 		LocalDate dateMin = byDays.firstKey().minusDays(1);
@@ -47,10 +47,8 @@ public class TestvirController {
 		// Si le département a été reçu en paramètre, la population est alors celle qui 
 		// est prise en compte.
 		if (dep != null) {
-			Datasets datasets = (Datasets) application.getAttribute("datasets");
-	
 			HashMap<String, HashMap> departements
-					= (HashMap<String, HashMap>) datasets.get("departements").getData();
+					= (HashMap<String, HashMap>) departementsDAO.getDepartements();
 			if (departements.get(dep) != null) {
 				HashMap<String, Object> departement = (HashMap<String, Object>) departements.get(dep);
 				population = (long) departement.get("PTOT");
@@ -58,7 +56,7 @@ public class TestvirController {
 		}
 	
 		// Calcul de l'évolution de l'incidence
-		TreeMap<LocalDate, TestVir> byWeeks = TestVir.cumulTestVirByWeeks(application, dep, true);
+		TreeMap<LocalDate, TestVir> byWeeks = testVirDAO.cumulTestVirByWeeks(dep, true);
 		TreeMap<LocalDate, Integer> incidences = new TreeMap<>();
 		for (Map.Entry<LocalDate, TestVir> entry : byWeeks.entrySet()) {
 			int incidence = Math.round(100_000 * entry.getValue().getPositifs() / population);
@@ -81,7 +79,6 @@ public class TestvirController {
 	@GetMapping("/testvir-dep")
     public ModelAndView day(@RequestParam(value="day", required=false) String paramDay) throws Exception {
 		ModelAndView modelAndView = new ModelAndView("testvir-dep");
-		ServletContext application = servletContextWrapper.getServletContext();
 
 		Logger logger = Logger.getLogger(this.getClass());
 
@@ -92,7 +89,7 @@ public class TestvirController {
 			day = LocalDate.parse(paramDay);
 		}
 	
-		TreeMap<LocalDate, TestVir> cumulByDay = TestVir.cumulTestVirByDay(application, null, false);
+		TreeMap<LocalDate, TestVir> cumulByDay = testVirDAO.cumulTestVirByDay(null, false);
 		model.put("cumulByDay", cumulByDay);
 		
 		if (day == null) {
@@ -100,7 +97,7 @@ public class TestvirController {
 		}
 		model.put("day", day);
 		
-		TreeMap<String, Double> variations = TestVir.getVariations(application, day);
+		TreeMap<String, Double> variations = testVirDAO.getVariations(day);
 		model.put("variations", variations);
 		
 		TestVir testVir = cumulByDay.get(day);
@@ -108,10 +105,10 @@ public class TestvirController {
 		//model.put("incid", Math.round(((double)testVir.getPositifs() * 100) / testVir.getTests()));
 		
 		TreeMap<String, TestVir> cumulTestVirByDepLastWeek
-				= TestVir.cumulTestVirByDepLastWeek(application, day);
-		Datasets datasets = (Datasets) application.getAttribute("datasets");
+				= testVirDAO.cumulTestVirByDepLastWeek(day);
+		
 		HashMap<String, HashMap> departements
-				= (HashMap<String, HashMap>) datasets.get("departements").getData();
+				= (HashMap<String, HashMap>) departementsDAO.getDepartements();
 		
 		TreeMap<String, Map> depStats = new TreeMap<>(); 
 		
