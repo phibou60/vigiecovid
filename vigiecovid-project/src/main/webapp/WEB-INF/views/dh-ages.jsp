@@ -101,12 +101,7 @@ var db = {};
 //}
 
 <c:forEach items="${model.cumulParDatesEtClasseAges}" var="entry">
-	var a = [];
-	<c:forEach items="${entry.value}" var="values">
-		a.push({dc: ${values.dc}, hosp: ${values.hosp}, rea: ${values.rea}});
-	</c:forEach>
-	db['${entry.key}'] = a;
-</c:forEach>
+db['${entry.key}'] = [<c:forEach items="${entry.value}" var="values" varStatus="loop">{dc: ${values.dc}, hosp: ${values.hosp}, rea: ${values.rea}}<c:if test="${not loop.last}">,</c:if></c:forEach>];</c:forEach>
 
 function dessine() {
 	
@@ -152,14 +147,17 @@ function dessine() {
 	maxHosp = tsArronditAuDessus(maxHosp);
 	maxRea = tsArronditAuDessus(maxRea);
 	
-	// Calcul du delta de dc
+	// Calcul du delta de dc et du max
 	var dcDeltaAges = [10]; var dcMoyAges = [10];
 	var maxDc = -1; 
 	for (var i=0; i<10; i++) {
 		dcDeltaAges[i] = tsDeltaValues(dcAges[i]);
-		var max = tsHighWaterMark(dcDeltaAges[i]);
-		if (max > maxDc) maxDc = max;
 		dcMoyAges[i] = tsMoyenneMobile(dcDeltaAges[i], 7);
+		
+		var max = tsHighWaterMark(dcMoyAges[i]);
+		if (max > maxDc) {
+			maxDc = max;
+		}
 	}
 	
 	maxDc = tsArronditAuDessus(maxDc);
