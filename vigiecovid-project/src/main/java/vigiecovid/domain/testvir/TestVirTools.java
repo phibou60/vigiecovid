@@ -40,6 +40,7 @@ public class TestVirTools {
 	 * @return
 	 * @throws Exception
 	 */
+	
 	public static TreeMap<LocalDate, Double> calculLinearProjectionlIncidence(
 			TreeMap<LocalDate, Integer> incidences) throws Exception {
 		
@@ -69,6 +70,7 @@ public class TestVirTools {
 	 * @return
 	 * @throws Exception
 	 */
+	
 	public static TreeMap<LocalDate, Double> calculPolynomialProjectionlIncidence(
 			TreeMap<LocalDate, Integer> incidences) throws Exception {
 		
@@ -80,12 +82,12 @@ public class TestVirTools {
 		PolynomialCurveFitter polynomialCurveFitter = PolynomialCurveFitter.create(2);
 		List<WeightedObservedPoint> points = new ArrayList<>();
 
-		for (Map.Entry<LocalDate, Integer> entry : incidences.entrySet()) {
-			if (entry.getKey().compareTo(dateMinProj) >= 0) {
-				points.add(new WeightedObservedPoint(1d, (double) entry.getKey().toEpochDay(),
-						(double) entry.getValue()));
-			}
-		}
+		incidences
+			.tailMap(dateMinProj)
+			.forEach((jour, value) -> 
+				points.add(new WeightedObservedPoint(1d, (double) jour.toEpochDay(), (double) value))
+			);
+
 		double[] coeffs = polynomialCurveFitter.fit(points);
 		PolynomialFunction polynomialFunction = new PolynomialFunction(coeffs);
 
