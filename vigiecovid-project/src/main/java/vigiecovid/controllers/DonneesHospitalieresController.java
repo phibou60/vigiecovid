@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import chamette.datascience.Calculs;
 import vigiecovid.domain.DepartementsDAO;
 import vigiecovid.domain.DonneesHospitalieres;
 import vigiecovid.domain.ServletContextWrapper;
@@ -421,7 +422,14 @@ public class DonneesHospitalieresController {
 		modelAndView.addObject("dateMin", reproductionTestVirByWeeks.firstKey());
 		modelAndView.addObject("dateMax", reproductionTestVirByWeeks.lastKey());
 		
-		LOGGER.info("variationTestVirByWeeks.size(): " + reproductionTestVirByWeeks.size());
+		double tvDernierRatio = reproductionTestVirByWeeks.lastEntry().getValue();
+		double txParJour = Calculs.tauxParPeriodes(tvDernierRatio - 1, 7);
+		double tvDoubleDesCas = Calculs.nbDePeriodes(txParJour, 1);
+		
+		modelAndView.addObject("tvDernierRatio", tvDernierRatio);
+		modelAndView.addObject("tvDoubleDesCas", tvDoubleDesCas);
+		
+		LOGGER.debug("variationTestVirByWeeks.size(): " + reproductionTestVirByWeeks.size());
 
 		return modelAndView;
 	}

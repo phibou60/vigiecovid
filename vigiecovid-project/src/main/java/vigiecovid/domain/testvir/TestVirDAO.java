@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import chamette.datascience.Calculs;
 import chamette.datasets.CommonDataset;
 import chamette.datasets.Dataset;
 import chamette.datasets.Datasets;
@@ -242,10 +243,10 @@ public class TestVirDAO {
 			LocalDate keyPrevWeek = entry.getKey().minusDays(7);
 			TestVir testVirPrevWeek = byWeeks.get(keyPrevWeek);
 			if (testVirPrevWeek != null) {
-				double taux = (double) entry.getValue().getPositifs() / testVirPrevWeek.getPositifs();
-				ret.put(entry.getKey(), taux);
+				double ratio = Calculs.ratio(testVirPrevWeek.getPositifs(), entry.getValue().getPositifs());
+				ret.put(entry.getKey(), ratio);
 				LOGGER.debug(keyPrevWeek + ": " + testVirPrevWeek.getPositifs() + " / " + entry.getKey() + ": "
-						+ entry.getValue().getPositifs() + " = " + taux);
+						+ entry.getValue().getPositifs() + " = " + ratio);
 			}
 		}
 

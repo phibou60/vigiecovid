@@ -24,7 +24,7 @@
 					<a class="dropdown-item" href="dh-rea">Réanimations</a>
 					<a class="dropdown-item" href="dh-correl">Corrélations de données</a>
 					<a class="dropdown-item" href="dh-ages">Tranches d'ages</a>
-					<a class="dropdown-item" href="dh-repro">Taux de reproduction</a>
+					<a class="dropdown-item" href="dh-repro">Nombre de reproduction</a>
 				</div>
 			</li>
 

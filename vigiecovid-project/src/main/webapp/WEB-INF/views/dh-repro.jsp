@@ -13,16 +13,21 @@
 <div class="container">
 	<div class="row">
 		<div class="col-xl">
-		<h3>Taux de reproduction (R0)</h3>
+		<h3>Nombre de reproduction (R0)</h3>
 		<p>
-		Le principe est simplement de faire le ratio de cas d'une semaine à l'autre.<br>
-		Ici, le calcul se fait à partir des chiffres d'incidence.
+		Le principe est ici de calculer le nombre de personne qu'un malade contamine.<br>
+		En théorie, le calcul devrait prendre en compte la période d'incubation
+		et la durée de la phase contagieuse mais on a simplifié ces principes dynamiques, en 
+		considérant que les malades d'une semaine ont été contaminés par les malades de la
+		semaine précédente. Le R0 est alors le ratio de l'incidence d'une semaine à l'autre. 
 		</p>
 		<p>
 		Dernières données <span class="badge badge-primary">${dateMax}</span>
-		Taux de reproduction :
-		<span class="badge badge-primary" id="lastRepro"></span>
-		</p> 
+		Un malade contamine <span class="badge badge-primary" id="lastRepro"></span> autres personnes.
+    </p> 
+    <p>
+    Les cas doublent tous les <span class="badge badge-primary" id="doubleDesCas"></span> jours.
+		</p>
 		</div>
 	</div>
 	<br>
@@ -38,15 +43,27 @@
 	<div class="row">
 		<div class="col-xl tuile"><div id="chart1" style="height:400px"></div></div>
 	</div>
+	
+	<p>
+    Voir l'article excellent de Wikipedia pour avoir plus d'explication :
+    <a href="https://fr.wikipedia.org/wiki/Nombre_de_reproduction_de_base" target="_BLANK">
+      https://fr.wikipedia.org/wiki/Nombre_de_reproduction_de_base
+    </a>
+  </p>
+  	
 </div>
 
 <script>
 var reproductionTestVirByWeeks = [
 <c:forEach items="${reproductionTestVirByWeeks}" var="entry" varStatus="loop">['${entry.key}', ${entry.value}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
 
-let lastRepro = reproductionTestVirByWeeks[reproductionTestVirByWeeks.length-1][1];
+let lastRepro = ${tvDernierRatio};
 let lastReproS = new Intl.NumberFormat().format(lastRepro);
-document.querySelector("#lastRepro").innerHTML =lastReproS;
+document.querySelector("#lastRepro").innerHTML = lastReproS;
+
+let tvDoubleDesCas = ${tvDoubleDesCas};
+let tvDoubleDesCasS = new Intl.NumberFormat().format(tvDoubleDesCas);
+document.querySelector("#doubleDesCas").innerHTML = tvDoubleDesCasS;
 
 var resizablePlots = [];
 
