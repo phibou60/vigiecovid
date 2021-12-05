@@ -1,7 +1,10 @@
 package vigiecovid.domain.vacsi;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.ServletContext;
 
@@ -9,9 +12,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import chamette.datasets.CommonDataset;
-import chamette.datasets.Dataset;
-import chamette.datasets.Datasets;
+import chamette.datasets.DatasetHelper;
 import chamette.datasets.EmptyLineException;
 import chamette.datasets.ParseException;
 
@@ -34,63 +35,27 @@ public class VacsiDAO {
 	 * @return
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	public TreeMap<LocalDate, Vacsi> getVacsiFranceByDay() throws Exception {
-		Datasets datasets = (Datasets) context.getAttribute("datasets");
-
-		String myDatasetName = "getVacsiFranceByDay";
-		String parentDatasetName = "vacsi-a-fra";
 		
-		if (datasets.exists(myDatasetName)) {
-			LOGGER.info("Return cache: "+myDatasetName);
-			return (TreeMap<LocalDate, Vacsi>) datasets.get(myDatasetName).getData();
-		}
-		
-		TreeMap<LocalDate, Vacsi> ret = new TreeMap<>();
-		
-		if (!datasets.exists(parentDatasetName)) {
-			return ret;
-		}
-		
-		LOGGER.info("Calculate new : "+myDatasetName);
-
-		Dataset myDataset = new CommonDataset(myDatasetName);
-		String[] lines = (String[]) datasets.get(parentDatasetName).getData();
-		
-		VacsiaParser parser = new VacsiaParser();
-		long parseExceptionCount = 0;
-		
-		boolean firstLine = true;
-		for (String line : lines) {
-			try {
-				if (!firstLine) {
-					Vacsi vacsi = parser.parse(line);
+		return (TreeMap<LocalDate, Vacsi>)
+				new DatasetHelper(context, "getVacsiFranceByDay", "vacsi-a-fra") {
+			
+			@Override
+			public Object calculateData(Object parentData) throws Exception {
+				String[] lines = (String[]) parentData;
 				
-					if (!vacsi.getClage().equals("0")) {
-						continue;
-					}
-		
-					ret.put(vacsi.getJour(), vacsi);
-				}
-				firstLine = false;
+				VacsiaParser parser = new VacsiaParser(lines[0]);
 				
-			} catch (EmptyLineException e) {
-				// Not a problem
-				LOGGER.trace("Exception: "+e);			
-			} catch (ParseException e) {
-				LOGGER.warn("Exception: "+e);
-				parseExceptionCount++;
-				if (parseExceptionCount > 10) {
-					throw e;
-				}
+				Map<LocalDate, Vacsi> map = Stream.of(lines)
+					.filter(l -> l.startsWith("FR;0;"))
+					.map(l -> parser.parse(l))
+					.filter(vacsi -> vacsi.getJour() != null)
+					.collect(Collectors.toMap(Vacsi::getJour, vacsi -> vacsi));
+				
+				return new TreeMap<LocalDate, Vacsi>(map);
 			}
-		}
-		
-		myDataset.setData(ret);
-		
-		datasets.add(myDataset);
-		datasets.get(parentDatasetName).addChildDataset(myDataset);
-
-		return ret;
+		}.getData();
 		
 	}
 

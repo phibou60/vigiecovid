@@ -15,30 +15,38 @@ import chamette.datasets.ParseException;
 public class VacsiaParser {
 
 	private final static Logger LOGGER = Logger.getLogger(VacsiaParser.class);
+	
 	private String sep = null;
-	private static final int NB_PARTS = 9;
+	private long parseExceptionCount = 0;
+	private static final int NB_PARTS = 12;
 	
-	public Vacsi parse(String line) throws ParseException, EmptyLineException {
+	public VacsiaParser(String firstLine) {
+		
+		sep = getSeparator(firstLine);
 
-		checkLine(line);
-		String[] splits = normalizeLine(line);
-		
-		//-- Create Object Vacsia
-		
-		Vacsi vacsia;
+	}
 	
+	public Vacsi parse(String line) {
+
 		try {
-			vacsia = new Vacsi(splits[1], "", LocalDate.parse(splits[2]),
-					Long.parseLong(splits[3]), Long.parseLong(splits[4]),
-					Long.parseLong(splits[5]),Long.parseLong(splits[6]),
-					Double.parseDouble(splits[7]),
-					Double.parseDouble(splits[8]));
-		} catch (Exception e) {
-			throw new ParseException("Exception "+e+" on line: "+line);
-		}
+			checkLine(line);
+			String[] splits = normalizeLine(line);
 
-		
-		return vacsia;
+			return new Vacsi(
+					splits[1], "", LocalDate.parse(splits[2]),
+					Long.parseLong(splits[3]), Long.parseLong(splits[4]), Long.parseLong(splits[5]),
+					Long.parseLong(splits[6]),Long.parseLong(splits[7]), Long.parseLong(splits[8]),
+					Double.parseDouble(splits[9]),
+					Double.parseDouble(splits[10]),
+					Double.parseDouble(splits[11]));
+		} catch (Exception e) {
+			parseExceptionCount++;
+			if (parseExceptionCount < 5) {
+				LOGGER.error("Exception " + e + " on line: " + line);
+			}
+			return new Vacsi(null, null, null);	
+		}
+			
 	}
 	
 	private void checkLine(String line) throws ParseException, EmptyLineException {
@@ -56,10 +64,6 @@ public class VacsiaParser {
 	}
 	
 	private String[] normalizeLine(String line) throws ParseException {
-	
-		if (sep == null)  {
-			sep = getSeparator(line);
-		}
 	
 		String[] baseSplits = line.split(sep);
 		LOGGER.debug("baseSplits: "+Arrays.toString(baseSplits));

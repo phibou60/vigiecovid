@@ -24,16 +24,10 @@
 
 <script>
 
-var vaccinJour = [];
-var cumComplet = [];
-var cumDose1 = [];
-<c:forEach items="${franceByDay}" var="entry">
-    vaccinJour.push(['${entry.key}', ${entry.value.dose1}+${entry.value.complet}]);
-    cumComplet.push(['${entry.key}', ${entry.value.cumComplet}]);
-    cumDose1.push(['${entry.key}', ${entry.value.cumDose1}]);
-</c:forEach>
-
-var barCharts = tsCreateBarChartArray(vaccinJour);
+var vaccinJour = [<c:forEach items="${franceByDay}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.dose1 + entry.value.complet + entry.value.rappel}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var cumComplet = [<c:forEach items="${franceByDay}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.cumComplet}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var cumDose1 = [<c:forEach items="${franceByDay}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.cumDose1}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var cumRappel = [<c:forEach items="${franceByDay}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.cumRappel}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
 
 // Intervalle complet des datas
 var dateMin = "${dateMin}";
@@ -47,33 +41,25 @@ function dessine() {
 	
 	resizablePlots = [];
 	
-	resizablePlots.push($.jqplot('chart1', [cumComplet, cumDose1], {
-		title:'Total Vaccination',
+	const seriesDefaults = {...standard_seriesDefaults};
+	seriesDefaults.lineWidth = 1;
+  seriesDefaults.markerOptions = {style: 'circle', size: 1};
+	
+	resizablePlots.push($.jqplot('chart1', [cumComplet, cumDose1, cumRappel], {
+		title:'Cumul Vaccination',
 		legend: standard_legend,
 		cursor:standard_cursor,
 		grid: standard_grid,
 		axes:standard_axes,
-		seriesDefaults: {
-			shadow: false,
-			markerOptions:{shadow: false},
-			lineWidth:2,
-			markerOptions:{style:'circle', size:2},
-			pointLabels: {show: false}
-		},
+		seriesDefaults: seriesDefaults,
 		series: [
-			{
-				label: 'Vaccination complête',
-				color: 'blue'
-			},
-			{
-				lineWidth:2,
-				label: 'Première dose',
-				color: 'navy'
-			}
+			{label: 'Vaccination complête'},
+			{label: 'Première dose'},
+		  {label: 'Rappel'}
 		],
 	}));
 	
-	resizablePlots.push($.jqplot("chart2", [barCharts], {
+	resizablePlots.push($.jqplot("chart2", [tsCreateBarChartArray(vaccinJour)], {
 		title:'Vaccinations par jour', 
 		cursor:standard_cursor,
 		grid: standard_grid,
