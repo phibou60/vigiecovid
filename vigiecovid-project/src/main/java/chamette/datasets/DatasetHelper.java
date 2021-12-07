@@ -1,26 +1,24 @@
 package chamette.datasets;
 
-import javax.servlet.ServletContext;
 import org.apache.log4j.Logger;
 
 public abstract class DatasetHelper {
 
 	private final Logger LOGGER = Logger.getLogger(DatasetHelper.class);
 	
-	private ServletContext context;
+	private Datasets datasets;
 	private String myDatasetName;
 	private String parentDatasetName;
 	
-	public DatasetHelper(ServletContext context, String myDatasetName, String parentDatasetName) {
+	public DatasetHelper(Datasets datasets, String myDatasetName, String parentDatasetName) {
 		
-		this.context = context;
+		this.datasets = datasets;
 		this.myDatasetName = myDatasetName;
 		this.parentDatasetName = parentDatasetName;
 	}
 	
 	public Object getData() throws Exception {
-		Datasets datasets = (Datasets) context.getAttribute("datasets");
-		
+				
 		if (datasets.exists(myDatasetName)) {
 			LOGGER.info("Return cache: "+myDatasetName);
 			return datasets.get(myDatasetName).getData();

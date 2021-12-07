@@ -6,6 +6,7 @@ import static chamette.tools.CsvTools.unquote;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 
@@ -26,25 +27,31 @@ public class VacsiaParser {
 
 	}
 	
-	public Vacsi parse(String line) {
+	public Vacsi parse(String line) throws ParseException, EmptyLineException {
+
+		checkLine(line);
+		String[] splits = normalizeLine(line);
+
+		return new Vacsi(
+				splits[1], "", LocalDate.parse(splits[2]),
+				Long.parseLong(splits[3]), Long.parseLong(splits[4]), Long.parseLong(splits[5]),
+				Long.parseLong(splits[6]),Long.parseLong(splits[7]), Long.parseLong(splits[8]),
+				Double.parseDouble(splits[9]),
+				Double.parseDouble(splits[10]),
+				Double.parseDouble(splits[11]));
+		
+	}
+	
+	public Stream<Vacsi> parseToStream(String line) {
 
 		try {
-			checkLine(line);
-			String[] splits = normalizeLine(line);
-
-			return new Vacsi(
-					splits[1], "", LocalDate.parse(splits[2]),
-					Long.parseLong(splits[3]), Long.parseLong(splits[4]), Long.parseLong(splits[5]),
-					Long.parseLong(splits[6]),Long.parseLong(splits[7]), Long.parseLong(splits[8]),
-					Double.parseDouble(splits[9]),
-					Double.parseDouble(splits[10]),
-					Double.parseDouble(splits[11]));
+			return Stream.of(parse(line));
 		} catch (Exception e) {
 			parseExceptionCount++;
 			if (parseExceptionCount < 5) {
 				LOGGER.error("Exception " + e + " on line: " + line);
 			}
-			return new Vacsi(null, null, null);	
+			return Stream.empty();	
 		}
 			
 	}

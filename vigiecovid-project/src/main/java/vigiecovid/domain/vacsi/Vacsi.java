@@ -22,6 +22,7 @@ public class Vacsi {
 			double couvDose1, double couvComplet, double couvRappel) {
 		super();
 		this.clage = clage;
+		this.dep = dep;
 		this.jour = jour;
 		this.dose1 = dose1;
 		this.complet = complet;
@@ -34,23 +35,6 @@ public class Vacsi {
 		this.couvDose1 = couvDose1;
 		this.couvComplet = couvComplet;
 		this.couvRappel = couvRappel;
-	}
-
-	public Vacsi(String clage, String dep, LocalDate jour) {
-		super();
-		this.clage = clage;
-		this.jour = jour;
-		this.dose1 = 0;
-		this.complet = 0;
-		this.rappel = 0;
-		
-		this.cumDose1 = 0;
-		this.cumComplet = 0;
-		this.cumRappel = 0;
-		
-		this.couvDose1 = 0;
-		this.couvComplet = 0;
-		this.couvRappel = 0;
 	}
 	
 	public String getClage() {
@@ -92,7 +76,7 @@ public class Vacsi {
 	
 	public void plus(Vacsi vacsia) {
 		this.dose1 += vacsia.dose1;
-		this.complet += vacsia.complet;
+		this.rappel += vacsia.rappel;
 		this.complet += vacsia.complet;
 		this.cumDose1 += vacsia.cumDose1;
 		this.cumComplet += vacsia.cumComplet;

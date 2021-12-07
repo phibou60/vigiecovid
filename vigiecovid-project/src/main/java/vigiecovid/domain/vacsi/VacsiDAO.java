@@ -13,8 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import chamette.datasets.DatasetHelper;
-import chamette.datasets.EmptyLineException;
-import chamette.datasets.ParseException;
+import chamette.datasets.Datasets;
 
 @Component
 public class VacsiDAO {
@@ -22,6 +21,7 @@ public class VacsiDAO {
 	private final Logger LOGGER = Logger.getLogger(VacsiDAO.class);
 
 	private ServletContext context;
+	private Datasets datasets;
 	
 	public VacsiDAO(@Autowired ServletContext context) {
 		super();
@@ -30,16 +30,11 @@ public class VacsiDAO {
 	}
 	
 	/**
-	 * Retourne les cumuls de vaccination par jour ai niveau france.
-	 * @param context Obligatoire
-	 * @return
-	 * @throws Exception
+	 * Retourne les cumuls de vaccination par jour au niveau france.
 	 */
-	@SuppressWarnings("unchecked")
 	public TreeMap<LocalDate, Vacsi> getVacsiFranceByDay() throws Exception {
 		
-		return (TreeMap<LocalDate, Vacsi>)
-				new DatasetHelper(context, "getVacsiFranceByDay", "vacsi-a-fra") {
+		DatasetHelper helper = new DatasetHelper(getDatasets(), "getVacsiFranceByDay", "vacsi-a-fra") {
 			
 			@Override
 			public Object calculateData(Object parentData) throws Exception {
@@ -49,14 +44,25 @@ public class VacsiDAO {
 				
 				Map<LocalDate, Vacsi> map = Stream.of(lines)
 					.filter(l -> l.startsWith("FR;0;"))
-					.map(l -> parser.parse(l))
-					.filter(vacsi -> vacsi.getJour() != null)
+					.flatMap(l -> parser.parseToStream(l))
 					.collect(Collectors.toMap(Vacsi::getJour, vacsi -> vacsi));
 				
 				return new TreeMap<LocalDate, Vacsi>(map);
 			}
-		}.getData();
+		};
+		return (TreeMap<LocalDate, Vacsi>) helper.getData();
 		
 	}
+	
+	public void setDatasets(Datasets datasets) {
+		this.datasets = datasets;
+	}
 
+	private Datasets getDatasets() {
+		if (datasets == null && context != null) { 
+			datasets = (Datasets) context.getAttribute("datasets");
+		}
+		return datasets;
+	}
+	
 }
