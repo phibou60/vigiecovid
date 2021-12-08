@@ -34,7 +34,8 @@ public class VacsiDAO {
 	 */
 	public TreeMap<LocalDate, Vacsi> getVacsiFranceByDay() throws Exception {
 		
-		DatasetHelper helper = new DatasetHelper(getDatasets(), "getVacsiFranceByDay", "vacsi-a-fra") {
+		DatasetHelper helper
+				= new DatasetHelper(getDatasets(), "getVacsiFranceByDay", "vacsi-a-fra") {
 			
 			@Override
 			public Object calculateData(Object parentData) throws Exception {

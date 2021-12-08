@@ -1,6 +1,8 @@
 package vigiecovid.domain;
 
-import static chamette.tools.CsvTools.*;
+import static chamette.tools.CsvTools.getSeparator;
+import static chamette.tools.CsvTools.normalizeDate;
+import static chamette.tools.CsvTools.unquote;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -13,41 +15,11 @@ import org.apache.log4j.Logger;
 import chamette.datasets.CommonDataset;
 import chamette.datasets.Dataset;
 import chamette.datasets.Datasets;
+import vigiecovid.domain.dh.Dh;
 
 public class DonneesHospitalieres {
-
-	public long hosp = 0;
-	public long rea = 0;
-	public long rad = 0;
-	public long dc = 0;
-
-	public DonneesHospitalieres() {
-	}
-		
-	public DonneesHospitalieres(long hosp, long rea, long rad, long dc) {
-		this.hosp = hosp;
-		this.rea = rea;
-		this.rad = rad;
-		this.dc = dc;
-	}
-
-	public long getHosp() {
-		return hosp;
-	}
-
-	public long getRea() {
-		return rea;
-	}
-
-	public long getRad() {
-		return rad;
-	}
 	
-	public long getDc() {
-		return dc;
-	}
-	
-	public static TreeMap<LocalDate, DonneesHospitalieres> getByDates(ServletContext context) throws Exception {
+	public static TreeMap<LocalDate, Dh> getByDates(ServletContext context) throws Exception {
 		Logger logger = Logger.getLogger("lectureDonneesHospitalieres");
 
 		String myDatasetName = "dh-cumul-byDates";
@@ -57,10 +29,10 @@ public class DonneesHospitalieres {
 		
 		if (datasets.exists(myDatasetName)) {
 			logger.info("Return cache: "+myDatasetName);
-			return (TreeMap<LocalDate, DonneesHospitalieres>) datasets.get(myDatasetName).getData();
+			return (TreeMap<LocalDate, Dh>) datasets.get(myDatasetName).getData();
 		}
 		
-		TreeMap<LocalDate, DonneesHospitalieres> ret = new TreeMap<>();
+		TreeMap<LocalDate, Dh> ret = new TreeMap<>();
 		
 		if (!datasets.exists(parentDatasetName)) {
 			return ret;
@@ -110,12 +82,12 @@ public class DonneesHospitalieres {
 				}
 				
 				if (ret.containsKey(jour)) {
-					DonneesHospitalieres cumul = ret.get(jour);
+					Dh cumul = ret.get(jour);
 					cumul.hosp += valeurs[0];
 					cumul.rea  += valeurs[1];
 					cumul.rad  += valeurs[2];
 					cumul.dc   += valeurs[3];
-				} else ret.put(jour, new DonneesHospitalieres(valeurs[0], valeurs[1], valeurs[2], valeurs[3]));
+				} else ret.put(jour, new Dh(valeurs[0], valeurs[1], valeurs[2], valeurs[3]));
 				
 			}
 			count++;
@@ -134,13 +106,13 @@ public class DonneesHospitalieres {
 	 * @return
 	 * @throws Exception
 	 */
-	public static TreeMap<LocalDate, DonneesHospitalieres> getDeltas(TreeMap<LocalDate, DonneesHospitalieres> from) throws Exception {
-		TreeMap<LocalDate, DonneesHospitalieres> ret = new TreeMap<>();
-		DonneesHospitalieres prev = null;
+	public static TreeMap<LocalDate, Dh> getDeltas(TreeMap<LocalDate, Dh> from) throws Exception {
+		TreeMap<LocalDate, Dh> ret = new TreeMap<>();
+		Dh prev = null;
 		
-		for (Map.Entry<LocalDate, DonneesHospitalieres> entry : from.entrySet()) {
+		for (Map.Entry<LocalDate, Dh> entry : from.entrySet()) {
 			if (prev != null) {
-				ret.put(entry.getKey(), new DonneesHospitalieres(
+				ret.put(entry.getKey(), new Dh(
 					entry.getValue().hosp - prev.hosp,
 					entry.getValue().rea  - prev.rea,
 					entry.getValue().rad  - prev.rad,
@@ -158,8 +130,8 @@ public class DonneesHospitalieres {
 	 * @return
 	 * @throws Exception
 	 */
-	public static TreeMap<LocalDate, DonneesHospitalieres> calculMoyenne(TreeMap<LocalDate, DonneesHospitalieres> from) throws Exception {
-		TreeMap<LocalDate, DonneesHospitalieres> ret = new TreeMap<>();
+	public static TreeMap<LocalDate, Dh> calculMoyenne(TreeMap<LocalDate, Dh> from) throws Exception {
+		TreeMap<LocalDate, Dh> ret = new TreeMap<>();
 		LocalDate startDate = from.firstKey();
 		long cumulhosp = 0;
 		for (LocalDate jour : from.keySet()) {
@@ -169,7 +141,7 @@ public class DonneesHospitalieres {
 		return ret;
 	}
 	
-	public static TreeMap<LocalDate, DonneesHospitalieres> getNouveauxByDate(ServletContext context) throws Exception {
+	public static TreeMap<LocalDate, Dh> getNouveauxByDate(ServletContext context) throws Exception {
 		Logger logger = Logger.getLogger("getNouveauxByDate");
 	
 		String myDatasetName = "dh-nouveaux";
@@ -179,10 +151,10 @@ public class DonneesHospitalieres {
 		
 		if (datasets.exists(myDatasetName)) {
 			logger.info("Return cache: "+myDatasetName);
-			return (TreeMap<LocalDate, DonneesHospitalieres>) datasets.get(myDatasetName).getData();
+			return (TreeMap<LocalDate, Dh>) datasets.get(myDatasetName).getData();
 		}
 		
-		TreeMap<LocalDate, DonneesHospitalieres> ret = new TreeMap<>();
+		TreeMap<LocalDate, Dh> ret = new TreeMap<>();
 		
 		if (!datasets.exists(parentDatasetName)) {
 			return ret;
@@ -210,14 +182,14 @@ public class DonneesHospitalieres {
 				}
 				
 				if (ret.containsKey(jour)) {
-					DonneesHospitalieres cumul = ret.get(jour);
+					Dh cumul = ret.get(jour);
 					cumul.hosp += valeurs[0];
 					cumul.rea  += valeurs[1];
 					cumul.dc   += valeurs[2];
 					cumul.rad  += valeurs[3];
 				} else {
 					logger.debug("jour: "+jour);
-					ret.put(jour, new DonneesHospitalieres(valeurs[0], valeurs[1], valeurs[2], valeurs[3]));
+					ret.put(jour, new Dh(valeurs[0], valeurs[1], valeurs[2], valeurs[3]));
 				}
 			}
 			count++;
@@ -231,7 +203,7 @@ public class DonneesHospitalieres {
 		return ret;
 	}
 	
-	public static TreeMap<String, DonneesHospitalieres> getCumulClasseAges(ServletContext context, LocalDate jourSelection) throws Exception {
+	public static TreeMap<String, Dh> getCumulClasseAges(ServletContext context, LocalDate jourSelection) throws Exception {
 		Logger logger = Logger.getLogger("getCumulClasseAges");
 		logger.info("jourSelection: "+jourSelection);
 		
@@ -242,10 +214,10 @@ public class DonneesHospitalieres {
 		
 		if (datasets.exists(myDatasetName)) {
 			logger.info("Return cache: "+myDatasetName);
-			return (TreeMap<String, DonneesHospitalieres>) datasets.get(myDatasetName).getData();
+			return (TreeMap<String, Dh>) datasets.get(myDatasetName).getData();
 		}
 		
-		TreeMap<String, DonneesHospitalieres> ret = new TreeMap<>();
+		TreeMap<String, Dh> ret = new TreeMap<>();
 		
 		if (!datasets.exists(parentDatasetName)) {
 			return ret;
@@ -287,9 +259,9 @@ public class DonneesHospitalieres {
 				logger.debug("jour: "+jour);
 				if (jour.equals(jourSelection) && !classeAge.equals("0")) {
 					
-					DonneesHospitalieres cumul = ret.get(classeAge);
+					Dh cumul = ret.get(classeAge);
 					if (cumul == null) {
-						cumul = new DonneesHospitalieres();
+						cumul = new Dh();
 						ret.put(classeAge, cumul);
 					}
 					cumul.hosp += Long.parseLong(unquote(splits[colHosp]));
@@ -309,7 +281,7 @@ public class DonneesHospitalieres {
 		return ret;
 	}
 
-	public static TreeMap<LocalDate, DonneesHospitalieres[]> getCumulParDatesEtClasseAges(javax.servlet.ServletContext context) throws Exception {
+	public static TreeMap<LocalDate, Dh[]> getCumulParDatesEtClasseAges(javax.servlet.ServletContext context) throws Exception {
 		Logger logger = Logger.getLogger("getCumulParDatesEtClasseAges");
 		
 		String parentDatasetName = "donnees-hospitalieres-classe-age-covid19";
@@ -319,10 +291,10 @@ public class DonneesHospitalieres {
 		
 		if (datasets.exists(myDatasetName)) {
 			logger.info("Return cache: "+myDatasetName);
-			return (TreeMap<LocalDate, DonneesHospitalieres[]>) datasets.get(myDatasetName).getData();
+			return (TreeMap<LocalDate, Dh[]>) datasets.get(myDatasetName).getData();
 		}
 		
-		TreeMap<LocalDate, DonneesHospitalieres[]> ret = new TreeMap<>();
+		TreeMap<LocalDate, Dh[]> ret = new TreeMap<>();
 		
 		if (!datasets.exists(parentDatasetName)) {
 			return ret;
@@ -363,10 +335,10 @@ public class DonneesHospitalieres {
 				
 				logger.debug("jour: "+jour);
 					
-				DonneesHospitalieres[] cumuls = ret.get(jour);
+				Dh[] cumuls = ret.get(jour);
 				if (cumuls == null) {
-					cumuls = new DonneesHospitalieres[11];
-					for (int i=0; i<cumuls.length; i++) cumuls[i] = new DonneesHospitalieres();
+					cumuls = new Dh[11];
+					for (int i=0; i<cumuls.length; i++) cumuls[i] = new Dh();
 					ret.put(jour, cumuls);
 				}
 				
@@ -386,5 +358,5 @@ public class DonneesHospitalieres {
 
 		return ret;
 	}
-
+	
 }
