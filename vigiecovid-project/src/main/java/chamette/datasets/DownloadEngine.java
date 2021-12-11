@@ -5,18 +5,18 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
 public class DownloadEngine extends TimerTask { 
+	private static final Logger LOGGER = Logger.getLogger(DownloadEngine.class);
 	private Datasets datasets;
-	private Logger logger;
 	private boolean setCancel = false;
 	private Date lastUpdate;
 	private Date lastCheck;
 		
 	public DownloadEngine(Datasets datasets) {
-		logger = Logger.getLogger(this.getClass().getName());
 		this.datasets = datasets;
 	}
 	
 	public void checkUpdate() {
+		LOGGER.info("**** Check Update ****");
 		lastCheck = new Date();
 		for (Dataset dataset : datasets.getAllDatasets().values()) {
 			if (dataset instanceof Downloadable) {
@@ -28,7 +28,7 @@ public class DownloadEngine extends TimerTask {
 						datasets.removeChildrenDatasets(dataset);
 					}
 				} catch (Exception e) {
-					logger.error("Exception: ", e);
+					LOGGER.error("Exception: ", e);
 				}
 			}
 		}

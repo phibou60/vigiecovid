@@ -18,7 +18,7 @@ import chamette.datasets.Datasets;
 import vigiecovid.domain.dh.Dh;
 
 public class DonneesHospitalieres {
-	
+/*	
 	public static TreeMap<LocalDate, Dh> getByDates(ServletContext context) throws Exception {
 		Logger logger = Logger.getLogger("lectureDonneesHospitalieres");
 
@@ -87,7 +87,7 @@ public class DonneesHospitalieres {
 					cumul.rea  += valeurs[1];
 					cumul.rad  += valeurs[2];
 					cumul.dc   += valeurs[3];
-				} else ret.put(jour, new Dh(valeurs[0], valeurs[1], valeurs[2], valeurs[3]));
+				} else ret.put(jour, new Dh("", "", jour, valeurs[0], valeurs[1], valeurs[2], valeurs[3]));
 				
 			}
 			count++;
@@ -99,20 +99,21 @@ public class DonneesHospitalieres {
 
 		return ret;
 	}
-	
+*/	
 	/**
 	 * Calcule le deltas d'un jour à l'autre
 	 * @param from
 	 * @return
 	 * @throws Exception
 	 */
+/*
 	public static TreeMap<LocalDate, Dh> getDeltas(TreeMap<LocalDate, Dh> from) throws Exception {
 		TreeMap<LocalDate, Dh> ret = new TreeMap<>();
 		Dh prev = null;
 		
 		for (Map.Entry<LocalDate, Dh> entry : from.entrySet()) {
 			if (prev != null) {
-				ret.put(entry.getKey(), new Dh(
+				ret.put(entry.getKey(), new Dh("", "", null, 
 					entry.getValue().hosp - prev.hosp,
 					entry.getValue().rea  - prev.rea,
 					entry.getValue().rad  - prev.rad,
@@ -123,13 +124,14 @@ public class DonneesHospitalieres {
 		}
 		return ret;
 	}
-	
+*/	
 	/**
 	 * Calcule la moyenne sur une semaine
 	 * @param from
 	 * @return
 	 * @throws Exception
 	 */
+/*
 	public static TreeMap<LocalDate, Dh> calculMoyenne(TreeMap<LocalDate, Dh> from) throws Exception {
 		TreeMap<LocalDate, Dh> ret = new TreeMap<>();
 		LocalDate startDate = from.firstKey();
@@ -140,7 +142,7 @@ public class DonneesHospitalieres {
 		
 		return ret;
 	}
-	
+*/	
 	public static TreeMap<LocalDate, Dh> getNouveauxByDate(ServletContext context) throws Exception {
 		Logger logger = Logger.getLogger("getNouveauxByDate");
 	
@@ -189,7 +191,7 @@ public class DonneesHospitalieres {
 					cumul.rad  += valeurs[3];
 				} else {
 					logger.debug("jour: "+jour);
-					ret.put(jour, new Dh(valeurs[0], valeurs[1], valeurs[2], valeurs[3]));
+					ret.put(jour, new Dh("", "", null, valeurs[0], valeurs[1], valeurs[2], valeurs[3]));
 				}
 			}
 			count++;

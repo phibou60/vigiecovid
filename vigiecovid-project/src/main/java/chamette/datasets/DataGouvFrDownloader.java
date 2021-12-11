@@ -14,6 +14,8 @@ import org.apache.log4j.Logger;
 
 public class DataGouvFrDownloader extends CommonDataset implements Downloadable {
 
+	private static final Logger LOGGER = Logger.getLogger(DataGouvFrDownloader.class);
+	
 	private String dgDatasets;
 	private String id;
 	private String lastDownloaded = "<none>";
@@ -22,7 +24,6 @@ public class DataGouvFrDownloader extends CommonDataset implements Downloadable 
 
 	public DataGouvFrDownloader(String filename, String dgDatasets, String id, String mode, String directoryToSaveTo) {
 		super(filename);
-		logger = Logger.getLogger(this.getClass());
 		this.dgDatasets = dgDatasets;
 		this.id = id;
 		this.mode = mode;
@@ -38,7 +39,7 @@ public class DataGouvFrDownloader extends CommonDataset implements Downloadable 
 			if (folder.exists()) {
 				File file = new File(directoryToSaveTo, getName() + ".csv");
 				if (file.exists()) {
-					logger.info("Read CSV file: " + file.getAbsolutePath());
+					LOGGER.info("Read CSV file: " + file.getAbsolutePath());
 		
 					try {
 						List<String> lines = Files.readAllLines(file.toPath());
@@ -46,38 +47,38 @@ public class DataGouvFrDownloader extends CommonDataset implements Downloadable 
 						setData(dataLines);
 						return true;
 					} catch (Exception e) {
-						logger.error("Exception: ", e);
+						LOGGER.error("Exception: ", e);
 					}
 				} else {
-					logger.info("Unknown CSV file: " + file.getAbsolutePath());
+					LOGGER.info("Unknown CSV file: " + file.getAbsolutePath());
 				}
 			} else {
-				logger.info("Unknown CSV directory: " + folder.getAbsolutePath());
+				LOGGER.info("Unknown CSV directory: " + folder.getAbsolutePath());
 			}
 		}
 
-		logger.info("Look for update for file \"" + getName() + "\". Last found file is " + lastDownloaded);
+		LOGGER.info("Look for update for file \"" + getName() + "\". Last found file is " + lastDownloaded);
 
 		RestTool restHelper = new RestTool("http://www.data.gouv.fr/api/1/");
 		restHelper.ignoreSSLCertificatVerification();
 		restHelper.get("datasets/" + dgDatasets);
 
 		if (restHelper.result != null) {
-			logger.trace("restHelper.content: " + restHelper.content);
+			LOGGER.trace("restHelper.content: " + restHelper.content);
 			JsonArray resources = restHelper.result.getJsonArray("resources");
 
 			for (int i = 0; i < resources.size(); i++) {
 				JsonObject resource = resources.getJsonObject(i);
 
-				logger.debug("- " + resource.getString("title") + ", id:" + resource.getString("id") + " >> "
+				LOGGER.debug("- " + resource.getString("title") + ", id:" + resource.getString("id") + " >> "
 						+ resource.getString("url"));
 
 				if (resource.getString("id").equals(id)) {
-					logger.debug(">> found ...");
+					LOGGER.debug(">> found ...");
 
 					if (!resource.getString("url").equals(lastDownloaded)) {
 						lastDownloaded = resource.getString("url");
-						logger.info(" >> found update " + resource.getString("url"));
+						LOGGER.info(" >> found update " + resource.getString("url"));
 
 						RestTool restHelperDownload = new RestTool(resource.getString("url"));
 						restHelperDownload.ignoreSSLCertificatVerification();
@@ -85,7 +86,7 @@ public class DataGouvFrDownloader extends CommonDataset implements Downloadable 
 
 						String[] lines = restHelperDownload.content.split("\n");
 						setData(lines);
-						logger.debug("   done. " + restHelperDownload.content.length() + " chars downloaded. "
+						LOGGER.debug("   done. " + restHelperDownload.content.length() + " chars downloaded. "
 								+ lines.length + " lines");
 						saveToFile();
 						nouveau = true;
@@ -99,26 +100,26 @@ public class DataGouvFrDownloader extends CommonDataset implements Downloadable 
 
 	public void saveToFile() throws Exception {
 		if (directoryToSaveTo == null) {
-			logger.debug("directoryToSaveTo == null");
+			LOGGER.debug("directoryToSaveTo == null");
 			return;
 		}
-		logger.info(" > save in folder: " + directoryToSaveTo);
+		LOGGER.info(" > save in folder: " + directoryToSaveTo);
 		File folder = new File(directoryToSaveTo);
 		if (directoryToSaveTo == null) {
-			logger.warn("Unknown directory to save to: " + directoryToSaveTo);
+			LOGGER.warn("Unknown directory to save to: " + directoryToSaveTo);
 			return;
 		}
 		File file = new File(folder, getName() + ".csv");
 		if (directoryToSaveTo == null) {
-			logger.warn("Unknown directory to save to: " + directoryToSaveTo);
+			LOGGER.warn("Unknown directory to save to: " + directoryToSaveTo);
 			return;
 		}
 		try {
 			String[] lines = (String[]) getData();
 			Files.write(file.toPath(), Arrays.asList(lines));
-			logger.info("   done");
+			LOGGER.info("   done");
 		} catch (Exception e) {
-			logger.warn("Exception:", e);
+			LOGGER.warn("Exception:", e);
 		}
 
 	}

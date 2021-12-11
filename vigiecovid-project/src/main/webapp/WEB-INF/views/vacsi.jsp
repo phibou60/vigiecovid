@@ -20,11 +20,16 @@
 		<div class="col-xl tuile"><div id="chart1"></div></div>
 		<div class="col-xl tuile"><div id="chart2"></div></div>
 	</div>
+	<div class="row">
+		<div class="col-xl tuile"><div id="chart3"></div></div>
+		<div class="col-xl tuile"><div id="chart4"></div></div>
+	</div>
 </div>
 
 <script>
 
 var vaccinJour = [<c:forEach items="${franceByDay}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.dose1 + entry.value.complet + entry.value.rappel}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var dose1Jour = [<c:forEach items="${franceByDay}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.dose1}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
 var cumComplet = [<c:forEach items="${franceByDay}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.cumComplet}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
 var cumDose1 = [<c:forEach items="${franceByDay}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.cumDose1}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
 var cumRappel = [<c:forEach items="${franceByDay}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.cumRappel}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
@@ -60,7 +65,7 @@ function dessine() {
 	}));
 	
 	resizablePlots.push($.jqplot("chart2", [tsCreateBarChartArray(vaccinJour)], {
-		title:'Vaccinations par jour', 
+		title:'Total vaccinations par jour', 
 		cursor:standard_cursor,
 		grid: standard_grid,
 		axes:standard_axes,
@@ -72,6 +77,20 @@ function dessine() {
 			}
 		],
 	}));
+	  
+	  resizablePlots.push($.jqplot("chart3", [tsCreateBarChartArray(dose1Jour)], {
+	    title:'Premières vaccinations par jour', 
+	    cursor:standard_cursor,
+	    grid: standard_grid,
+	    axes:standard_axes,
+	    series: [
+	      {
+	        renderer:$.jqplot.OHLCRenderer,
+	        rendererOptions:{candleStick:true},
+	        color: 'navy'
+	      }
+	    ],
+	  }));
 
 }
 

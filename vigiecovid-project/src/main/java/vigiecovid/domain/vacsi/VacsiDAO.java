@@ -44,6 +44,7 @@ public class VacsiDAO {
 				VacsiaParser parser = new VacsiaParser(lines[0]);
 				
 				Map<LocalDate, Vacsi> map = Stream.of(lines)
+					.skip(1)
 					.filter(l -> l.startsWith("FR;0;"))
 					.flatMap(l -> parser.parseToStream(l))
 					.collect(Collectors.toMap(Vacsi::getJour, vacsi -> vacsi));

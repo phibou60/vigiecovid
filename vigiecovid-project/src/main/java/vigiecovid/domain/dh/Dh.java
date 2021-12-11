@@ -1,7 +1,12 @@
 package vigiecovid.domain.dh;
 
+import java.time.LocalDate;
+
 public class Dh {
 
+	public String dep;
+	public String sexe;
+	public LocalDate jour;
 	public long hosp = 0;
 	public long rea = 0;
 	public long rad = 0;
@@ -10,11 +15,26 @@ public class Dh {
 	public Dh() {
 	}
 		
-	public Dh(long hosp, long rea, long rad, long dc) {
+	public Dh(String dep, String sexe, LocalDate jour, long hosp, long rea, long rad, long dc) {
+		this.dep = dep;
+		this.sexe = sexe;
+		this.jour = jour;
 		this.hosp = hosp;
 		this.rea = rea;
 		this.rad = rad;
 		this.dc = dc;
+	}
+
+	public String getDep() {
+		return dep;
+	}
+
+	public String getSexe() {
+		return sexe;
+	}
+
+	public LocalDate getJour() {
+		return jour;
 	}
 
 	public long getHosp() {

@@ -7,19 +7,20 @@ import org.apache.log4j.Logger;
 
 public class DatasetFromCsvFile extends CommonDataset { 
 
+	private static final Logger LOGGER = Logger.getLogger(DatasetFromCsvFile.class);
+
 	public DatasetFromCsvFile(String folder, String filename) {
 		super(filename);
-		logger = Logger.getLogger(this.getClass());
 		
 		File file = new File(folder, filename+".csv");
-		logger.info("Read CSV file: "+file.getAbsolutePath());
+		LOGGER.info("Read CSV file: "+file.getAbsolutePath());
 		
 		try {
 			List<String> lines = Files.readAllLines(file.toPath());
 			String[] dataLines = lines.toArray(new String[lines.size()]);
 			setData(dataLines);
 		} catch(Exception e) {
-			logger.error("Exception: ", e);
+			LOGGER.error("Exception: ", e);
 		}
 		
 	}

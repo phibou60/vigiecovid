@@ -1,8 +1,8 @@
 package chamette.datasets;
 
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Timer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
@@ -14,7 +14,8 @@ import org.apache.log4j.Logger;
  */
 public class Datasets {
 
-	private Map<String, Dataset> datasets = new Hashtable<>(); // We use Hashtable because of concurrent access
+	 // We use ConcurrentHashMap because of concurrent access
+	private Map<String, Dataset> datasets = new ConcurrentHashMap<>();
 	private DownloadEngine downloadEngine;
 	private Timer timer;
 	private Logger logger;

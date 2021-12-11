@@ -11,11 +11,12 @@ import org.apache.log4j.Logger;
  *
  */
 public class CommonDataset implements Dataset {
+
+	protected static final Logger LOGGER = Logger.getLogger(CommonDataset.class);
 	
 	private String name;
 	protected Object data;
 	private List<Dataset> children = new ArrayList<>();
-	protected Logger logger;
 
 	public CommonDataset(String name) {
 		this.name = name;
@@ -33,7 +34,7 @@ public class CommonDataset implements Dataset {
 	 * A child Dataset is a Dataset that is calculated from this Dataset.
 	 */
 	public Dataset addChildDataset(Dataset child) {
-		logger.info("Add child Dataset ("+child.getName()+") to "+name);
+		LOGGER.info("Add child Dataset ("+child.getName()+") to "+name);
 		children.add(child);
 		return this;
 	}
