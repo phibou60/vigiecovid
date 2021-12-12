@@ -30,7 +30,7 @@ public class DhDAO {
 	}
 	
 	/**
-	 * Retourne les cumuls de vaccination par jour au niveau france.
+	 * Retourne les cumuls par jour au niveau france.
 	 */
 
 	public TreeMap<LocalDate, Dh> getDhByDay() throws Exception {
@@ -92,30 +92,6 @@ public class DhDAO {
 		};
 		return (TreeMap<LocalDate, Dh>) helper.getData();
 		
-	}
-	
-	/**
-	 * Calcule le deltas d'un jour à l'autre
-	 */
-
-	public static TreeMap<LocalDate, Dh> getDeltasByDay2(TreeMap<LocalDate, Dh> from)
-			throws Exception {
-		
-		TreeMap<LocalDate, Dh> ret = new TreeMap<>();
-		Dh prev = null;
-		
-		for (Map.Entry<LocalDate, Dh> entry : from.entrySet()) {
-			if (prev != null) {
-				ret.put(entry.getKey(), new Dh("", "", entry.getKey(), 
-					entry.getValue().hosp - prev.hosp,
-					entry.getValue().rea  - prev.rea,
-					entry.getValue().rad  - prev.rad,
-					entry.getValue().dc   - prev.dc
-				));
-			}
-			prev = entry.getValue();
-		}
-		return ret;
 	}
 	
 	public void setDatasets(Datasets datasets) {

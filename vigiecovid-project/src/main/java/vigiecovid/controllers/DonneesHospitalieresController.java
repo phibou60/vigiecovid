@@ -32,6 +32,8 @@ import vigiecovid.domain.DepartementsDAO;
 import vigiecovid.domain.DonneesHospitalieres;
 import vigiecovid.domain.ServletContextWrapper;
 import vigiecovid.domain.dh.Dh;
+import vigiecovid.domain.dh.DhClAge;
+import vigiecovid.domain.dh.DhClAgeDAO;
 import vigiecovid.domain.dh.DhDAO;
 import vigiecovid.domain.testvir.TestVirDAO;
 
@@ -42,7 +44,10 @@ public class DonneesHospitalieresController {
 	private ServletContextWrapper servletContextWrapper;	
 
 	@Autowired
-	private DhDAO dhDao;
+	private DhDAO dhDAO;
+
+	@Autowired
+	private DhClAgeDAO dhClAgeDAO;
 
 	@Autowired
 	private TestVirDAO testVirDAO;
@@ -54,14 +59,14 @@ public class DonneesHospitalieresController {
 		ModelAndView modelAndView = new ModelAndView("dh-dc");
 		Map<String, Object> model = new HashMap<>();
 
-		TreeMap<LocalDate, Dh> dh = dhDao.getDhByDay();
+		TreeMap<LocalDate, Dh> dh = dhDAO.getDhByDay();
 		LocalDate lastDayOfData = dh.lastKey();
 		LocalDate dateMin = dh.firstKey().minusDays(1);
 		LocalDate dateMax = lastDayOfData.plusDays(1);
 	
-		TreeMap<LocalDate, Dh> variations = dhDao.getDeltasDhByDay();
+		TreeMap<LocalDate, Dh> variations = dhDAO.getDeltasDhByDay();
 	
-		TreeMap<String, Dh> cumulClasseAges = DonneesHospitalieres.getCumulClasseAges(servletContextWrapper.getServletContext(), lastDayOfData);
+		TreeMap<String, DhClAge> cumulClasseAges = dhClAgeDAO.getCumulClasseAges(lastDayOfData);
 	
 		//---- Projection
 	
@@ -109,14 +114,14 @@ public class DonneesHospitalieresController {
 		ModelAndView modelAndView = new ModelAndView("dh-hosp");
 		Map<String, Object> model = new HashMap<>();
 
-		TreeMap<LocalDate, Dh> dh = dhDao.getDhByDay();
+		TreeMap<LocalDate, Dh> dh = dhDAO.getDhByDay();
 		LocalDate lastDayOfData = dh.lastKey();
 		LocalDate dateMin = dh.firstKey().minusDays(1);
 		LocalDate dateMax = lastDayOfData.plusDays(1);
 		
 		TreeMap<LocalDate, Dh> nouveaux = DonneesHospitalieres.getNouveauxByDate(servletContextWrapper.getServletContext());
 
-		TreeMap<String, Dh> cumulClasseAges = DonneesHospitalieres.getCumulClasseAges(servletContextWrapper.getServletContext(), lastDayOfData);
+		TreeMap<String, DhClAge> cumulClasseAges = dhClAgeDAO.getCumulClasseAges(lastDayOfData);
 
 		//---- Projection
 
@@ -186,14 +191,14 @@ public class DonneesHospitalieresController {
 		ModelAndView modelAndView = new ModelAndView("dh-rea");
 		Map<String, Object> model = new HashMap<>();
 		
-		TreeMap<LocalDate, Dh> dh = dhDao.getDhByDay();
+		TreeMap<LocalDate, Dh> dh = dhDAO.getDhByDay();
 		LocalDate lastDayOfData = dh.lastKey();
 		LocalDate dateMin = dh.firstKey().minusDays(1);
 		LocalDate dateMax = lastDayOfData.plusDays(1);
 		
 		TreeMap<LocalDate, Dh> nouveaux = DonneesHospitalieres.getNouveauxByDate(servletContextWrapper.getServletContext());
 
-		TreeMap<String, Dh> cumulClasseAges = DonneesHospitalieres.getCumulClasseAges(servletContextWrapper.getServletContext(), lastDayOfData);
+		TreeMap<String, DhClAge> cumulClasseAges = dhClAgeDAO.getCumulClasseAges(lastDayOfData);
 
 		//---- Projection
 
@@ -263,7 +268,7 @@ public class DonneesHospitalieresController {
 		ModelAndView modelAndView = new ModelAndView("dh-ages");
 		Map<String, Object> model = new HashMap<>();
 
-		TreeMap<LocalDate, Dh> dh = dhDao.getDhByDay();
+		TreeMap<LocalDate, Dh> dh = dhDAO.getDhByDay();
 		LocalDate lastKey = dh.lastKey();
 		TreeMap<LocalDate, Dh[]> cumulParDatesEtClasseAges = DonneesHospitalieres.getCumulParDatesEtClasseAges(servletContextWrapper.getServletContext());
 		
@@ -350,7 +355,7 @@ public class DonneesHospitalieresController {
 			
 			correlMsg = "entre le nombre de réanimations et d'hospitalisations";
 			
-			TreeMap<LocalDate, Dh> nouveaux = dhDao.getDhByDay();
+			TreeMap<LocalDate, Dh> nouveaux = dhDAO.getDhByDay();
 	
 			dateMin = LocalDate.of(2020, 3, 31);
 			dateMax = nouveaux.lastKey().plusDays(1);

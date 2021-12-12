@@ -10,7 +10,7 @@ import chamette.datasets.ParseException;
 public class VacsiaParserTest {
 
 	@Test
-	public void testVacsiaParser() throws ParseException, EmptyLineException {
+	public void testParser() throws ParseException, EmptyLineException {
 		String line0 = "fra;clage_vacsi;jour;n_dose1;n_complet;n_rappel;n_cum_dose1;n_cum_complet;"
 				+"n_cum_rappel;couv_dose1;couv_complet;couv_rappel";
 		VacsiaParser parser = new VacsiaParser(line0);
@@ -35,7 +35,7 @@ public class VacsiaParserTest {
 	}
 
 	@Test
-	public void testVacsiaParserOtherSep() throws ParseException, EmptyLineException {
+	public void testParserOtherSep() throws ParseException, EmptyLineException {
 		String line0 = "fra,clage_vacsi,jour,n_dose1,n_complet,n_rappel,n_cum_dose1,n_cum_complet,"
 				+"n_cum_rappel,couv_dose1,couv_complet,couv_rappel";
 		VacsiaParser parser = new VacsiaParser(line0);
