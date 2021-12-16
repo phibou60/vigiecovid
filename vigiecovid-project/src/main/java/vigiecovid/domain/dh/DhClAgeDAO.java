@@ -1,6 +1,7 @@
 package vigiecovid.domain.dh;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -59,6 +60,43 @@ public class DhClAgeDAO {
 			}
 		};
 		return (TreeMap<String, DhClAge>) helper.getData();
+		
+	}
+	
+	public Map<String, List<DhClAge>> getCumulParDatesEtClasseAges() throws Exception {
+		
+		DatasetHelper helper = new DatasetHelper(getDatasets(), "getCumulParDatesEtClasseAges",
+				"donnees-hospitalieres-classe-age-covid19") {
+			
+			@Override
+			public Object calculateData(Object parentData) throws Exception {
+				String[] lines = (String[]) parentData;
+				
+				DhClAgeParser parser = new DhClAgeParser(lines[0]);
+				
+				Map<String, DhClAge> map = Stream.of(lines)
+					.skip(1)
+					.flatMap(l -> parser.parseToStream(l))
+					.filter(d -> !d.getClAge().equals("0"))
+					.collect(Collectors.toMap(
+							d -> d.getClAge()+";"+d.getJour(),
+							dh -> dh,
+							(d1, d2) -> d1.plus(d2)));
+				
+				map.entrySet().stream().limit(10).forEach(LOGGER::debug); 
+				
+				Map<String, List<DhClAge>> ret = map.values().stream()
+					.collect(Collectors.groupingBy(DhClAge::getClAge));
+				
+				ret.entrySet().stream().limit(10).forEach(e -> {
+					LOGGER.debug(e.getKey());
+					e.getValue().stream().limit(10).forEach(LOGGER::debug);
+				}); 
+				
+				return ret;
+			}
+		};
+		return (Map<String, List<DhClAge>>) helper.getData();
 		
 	}
 	

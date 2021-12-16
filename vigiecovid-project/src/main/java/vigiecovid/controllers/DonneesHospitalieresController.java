@@ -28,13 +28,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import chamette.datascience.Calculs;
-import vigiecovid.domain.DepartementsDAO;
 import vigiecovid.domain.DonneesHospitalieres;
 import vigiecovid.domain.ServletContextWrapper;
 import vigiecovid.domain.dh.Dh;
 import vigiecovid.domain.dh.DhClAge;
 import vigiecovid.domain.dh.DhClAgeDAO;
 import vigiecovid.domain.dh.DhDAO;
+import vigiecovid.domain.dh.DhTools;
 import vigiecovid.domain.testvir.TestVirDAO;
 
 @Controller
@@ -59,48 +59,30 @@ public class DonneesHospitalieresController {
 		ModelAndView modelAndView = new ModelAndView("dh-dc");
 		Map<String, Object> model = new HashMap<>();
 
-		TreeMap<LocalDate, Dh> dh = dhDAO.getDhByDay();
-		LocalDate lastDayOfData = dh.lastKey();
-		LocalDate dateMin = dh.firstKey().minusDays(1);
+		TreeMap<LocalDate, Dh> dhs = dhDAO.getDhByDay();
+		
+		LocalDate lastDayOfData = dhs.lastKey();
+		LocalDate dateMin = dhs.firstKey().minusDays(1);
 		LocalDate dateMax = lastDayOfData.plusDays(1);
 	
 		TreeMap<LocalDate, Dh> variations = dhDAO.getDeltasDhByDay();
 	
 		TreeMap<String, DhClAge> cumulClasseAges = dhClAgeDAO.getCumulClasseAges(lastDayOfData);
 	
-		//---- Projection
-	
-		LocalDate dateMinProj = lastDayOfData.minusWeeks(2);
-		LocalDate dateMaxProj = lastDayOfData.plusWeeks(2);
-	
-		SimpleRegression simpleRegression = new SimpleRegression();
-		for (LocalDate jour : variations.keySet()) {
-			if (jour.compareTo(dateMinProj) > 0) {
-				simpleRegression.addData((double) jour.toEpochDay(), (double) variations.get(jour).dc);
-			}
-		}
-	
-		Map<LocalDate, Double> proj = new HashMap<>();
-		for (LocalDate jour = dateMinProj; jour.compareTo(dateMaxProj) <= 0; jour = jour.plusDays(1)) {
-			proj.put(jour, simpleRegression.predict((double) jour.toEpochDay()));
-		}
-	
-		//---- Calculate total dc
-	
-		Dh lastCumul = dh.get(lastDayOfData);
+		TreeMap<LocalDate, Double> proj = DhTools.calculPolynomialProjection(variations, "dc");
 	
 		//---- Alimentation du modèle
 	
 		model.put("lastDayOfData", lastDayOfData);
-		model.put("totalDc", lastCumul.dc);
+		model.put("totalDc", dhs.get(lastDayOfData).dc);
 	
 		model.put("dateMin", dateMin);
 		model.put("dateMax", dateMax);
 	
-		model.put("dateMinProj", dateMinProj);
-		model.put("dateMaxProj", dateMaxProj);
+		model.put("dateMinProj", proj.firstKey());
+		model.put("dateMaxProj", proj.lastKey());
 	
-		model.put("dh", dh);
+		model.put("dh", dhs);
 		model.put("variations", variations);
 		model.put("cumulClasseAges", cumulClasseAges);
 		model.put("proj", proj);

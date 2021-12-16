@@ -44,26 +44,16 @@
 
 <script>
 
-var dh = [];
-<c:forEach items="${model.dh}" var="entry">
-	dh.push(['${entry.key}', ${entry.value.dc}]);
-</c:forEach>
-var deltas = tsDeltaValues(dh);
+var dh = [<c:forEach items="${model.dh}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.dc}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var deltas = [<c:forEach items="${model.variations}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.dc}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var serieCA = [<c:forEach items="${model.cumulClasseAges}" var="entry" varStatus="loop">${entry.value.dc}<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var projection = [<c:forEach items="${model.proj}" var="entry" varStatus="loop">['${entry.key}', ${entry.value}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+
 var barChartsDeltas = tsCreateBarChartArray(deltas);
 var avgDeltas = tsMoyenneMobile(deltas, 7)
 
 document.getElementById('lastDc').innerHTML = deltas[deltas.length-1][1];
 document.getElementById('lastSemaineMoyDc').innerHTML = Math.trunc(avgDeltas[avgDeltas.length-1][1]);
-
-var serieCA = [];
-<c:forEach items="${model.cumulClasseAges}" var="entry">
-	serieCA.push(${entry.value.dc});
-</c:forEach>
-
-var projection = [];
-<c:forEach items="${model.proj}" var="entry">
-	projection.push(['${entry.key}', ${entry.value}]);
-</c:forEach>
 
 // Projection
 var dateMinProj = "${model.dateMinProj}";
@@ -86,7 +76,7 @@ function dessine() {
 	resizablePlots = [];
 	
 	resizablePlots.push($.jqplot('chartDc', [selectValues(dh, dateMin, dateMax)], {
-		title:'<fmt:formatNumber value="${model.totalDc}" maxFractionDigits="3"/> décès', 
+		title:'Décès cumulés (<fmt:formatNumber value="${model.totalDc}" maxFractionDigits="3"/>)', 
 		cursor:standard_cursor,
 		grid: standard_grid,
 		axes:standard_axes,
@@ -114,9 +104,11 @@ function dessine() {
 		],
 	}));
 
-	resizablePlots.push($.jqplot('chart3', [selectValues(deltas, dateMinProj, dateMaxProj), projection], {
+	resizablePlots.push($.jqplot('chart3', [selectValues(barChartsDeltas, dateMinProj, dateMaxProj), projection], {
 		title:'Tendance décès par jour', 
-		cursor:standard_cursor,
+		cursor: standard_cursor,
+	  seriesDefaults: standard_seriesDefaults,
+	  grid: standard_grid,
 		axes:{
 			xaxis:{
 				renderer:$.jqplot.DateAxisRenderer,
@@ -140,29 +132,38 @@ function dessine() {
 				tickOptions: { formatString: "%'i" }
 			}
 		},
-		seriesDefaults: standard_seriesDefaults,
-		series:[standard_stock_series, standard_line_series],
-		grid: standard_grid
+		series: [
+      {
+        renderer:$.jqplot.OHLCRenderer,
+        rendererOptions:{candleStick:true},
+        color: 'orange'
+      },
+      {
+        lineWidth:2,
+        markerOptions:{style:'circle', size:2},
+        pointLabels: {show: false},
+        color: 'navy'
+      }
+		]
 	}));
 
 	resizablePlots.push($.jqplot('chart4', [serieCA], {
 		title:'Répartition des décès par classe d\'ages', 
 		grid: standard_grid,
 		seriesDefaults:{
-            renderer:$.jqplot.BarRenderer,
-            pointLabels: { show: true }
-        },
+      renderer:$.jqplot.BarRenderer,
+      pointLabels: { show: true }
+    },
 		axes: {
-			xaxis: {
-                renderer: $.jqplot.CategoryAxisRenderer,
-                ticks: ticksClasseAges
-            },
+			xaxis:{
+        renderer: $.jqplot.CategoryAxisRenderer,
+        ticks: ticksClasseAges
+      },
 			yaxis:{
 				min:0,
 				rendererOptions: {forceTickAt0: true},				
 				tickOptions: { formatString: "%'i" }
 			},
-
 		},
 		highlighter: { show: false }
 	}));

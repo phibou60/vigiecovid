@@ -62,4 +62,8 @@ public class DhClAge {
 		return this;
 	}
 
+	@Override
+	public String toString() {
+		return reg+";"+clAge+";"+jour+";"+hosp+";"+rea+";"+rad+";"+dc;
+	}
 }

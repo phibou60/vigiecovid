@@ -52,6 +52,19 @@ public class Dh {
 	public long getDc() {
 		return dc;
 	}
+	
+	public long get(String metric) {
+		switch (metric) {
+		  case "dc":
+		    return dc;
+		  case "hosp":
+			  return hosp;
+		  case "rea":
+			  return rea;
+		  default:
+			  return rad;
+		}
+	}
 
 	public Dh plus(Dh d2) {
 		hosp += d2.getHosp();
@@ -59,6 +72,11 @@ public class Dh {
 		rad += d2.getRad();
 		dc += d2.getDc();
 		return this;
+	}
+
+	@Override
+	public String toString() {
+		return dep+";"+sexe+";"+jour+";"+hosp+";"+rea+";"+rad+";"+dc;
 	}
 
 }
