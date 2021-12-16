@@ -37,7 +37,7 @@ public class DhClAgeDAOTest {
 		assertEquals(2390, dhClAge.getHosp());
 		assertEquals(729, dhClAge.getRea());
 		assertEquals(76930, dhClAge.getRad()); // not verified
-		assertEquals(725, dhClAge.getDc());
+		assertEquals(10588, dhClAge.getDc());
 
 		assertEquals(107, map.get("09").getHosp());
 		assertEquals(56, map.get("19").getHosp());
