@@ -4,16 +4,14 @@ import java.time.LocalDate;
 
 public class Dh {
 
-	public String dep;
-	public String sexe;
-	public LocalDate jour;
-	public long hosp = 0;
-	public long rea = 0;
-	public long rad = 0;
-	public long dc = 0;
-
-	public Dh() {
-	}
+	private String dep;
+	private String sexe;
+	private LocalDate jour;
+	private long hosp = 0;
+	private long rea = 0;
+	private long rad = 0;
+	private long dc = 0;
+	private long count = 0;
 		
 	public Dh(String dep, String sexe, LocalDate jour, long hosp, long rea, long rad, long dc) {
 		this.dep = dep;
@@ -23,6 +21,7 @@ public class Dh {
 		this.rea = rea;
 		this.rad = rad;
 		this.dc = dc;
+		count = 1;
 	}
 
 	public String getDep() {
@@ -71,7 +70,21 @@ public class Dh {
 		rea += d2.getRea();
 		rad += d2.getRad();
 		dc += d2.getDc();
+		count++;
 		return this;
+	}
+
+	public Dh avg() {
+		hosp = hosp / count;
+		rea = rea / count;
+		rad = rad / count;
+		dc = dc / count;
+		count = 1;
+		return this;
+	}
+
+	public Dh clone() {
+		return new Dh(dep, sexe, jour, hosp, rea, rad, dc);
 	}
 
 	@Override

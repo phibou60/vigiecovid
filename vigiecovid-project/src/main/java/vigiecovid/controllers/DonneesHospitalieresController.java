@@ -57,6 +57,88 @@ public class DonneesHospitalieresController {
 	@GetMapping("/dh-dc")
     public ModelAndView dc() throws Exception {
 		ModelAndView modelAndView = new ModelAndView("dh-dc");
+
+		TreeMap<LocalDate, Dh> dhs = dhDAO.getDhByDay();
+		
+		LocalDate lastDayOfData = dhs.lastKey();
+		LocalDate dateMin = dhs.firstKey().minusDays(1);
+		LocalDate dateMax = lastDayOfData.plusDays(1);
+	
+		TreeMap<LocalDate, Dh> deltas = dhDAO.getDeltasDhByDay();
+			
+		TreeMap<LocalDate, Dh> avgDeltas = DhTools.avgOverAWeek(deltas);
+
+		TreeMap<String, DhClAge> cumulClasseAges = dhClAgeDAO.getCumulClasseAges(lastDayOfData);
+	
+		TreeMap<LocalDate, Double> proj = DhTools.calculPolynomialProjection(deltas, "dc");
+		
+		//---- Alimentation du modèle
+	
+		modelAndView.addObject("lastDayOfData", lastDayOfData);
+		modelAndView.addObject("totalDc", dhs.get(lastDayOfData).getDc());
+	
+		modelAndView.addObject("dateMin", dateMin);
+		modelAndView.addObject("dateMax", dateMax);
+	
+		modelAndView.addObject("dateMinProj", proj.firstKey());
+		modelAndView.addObject("dateMaxProj", proj.lastKey());
+	
+		modelAndView.addObject("dhs", dhs);
+		modelAndView.addObject("deltas", deltas);
+		modelAndView.addObject("avgDeltas", avgDeltas);
+		modelAndView.addObject("cumulClasseAges", cumulClasseAges);
+		modelAndView.addObject("proj", proj);
+
+		return modelAndView;
+    }
+
+	@GetMapping("/dh-hosp")
+    public ModelAndView hosp() throws Exception {
+		ModelAndView modelAndView = new ModelAndView("dh-hosp");
+
+		TreeMap<LocalDate, Dh> dhs = dhDAO.getDhByDay();
+		
+		LocalDate lastDayOfData = dhs.lastKey();
+		LocalDate dateMin = dhs.firstKey().minusDays(1);
+		LocalDate dateMax = lastDayOfData.plusDays(1);
+	
+		TreeMap<LocalDate, Dh> deltas = dhDAO.getDeltasDhByDay();
+			
+		TreeMap<LocalDate, Dh> avgDeltas = DhTools.avgOverAWeek(deltas);
+
+		TreeMap<String, DhClAge> cumulClasseAges = dhClAgeDAO.getCumulClasseAges(lastDayOfData);
+	
+		TreeMap<LocalDate, Double> proj = DhTools.calculPolynomialProjection(dhs, "hosp");
+		
+		TreeMap<LocalDate, Dh> nouveaux = DonneesHospitalieres.getNouveauxByDate(servletContextWrapper.getServletContext());
+		
+		TreeMap<LocalDate, Dh> avgNouveaux = DhTools.avgOverAWeek(nouveaux);
+
+		//---- Alimentation du modèle
+
+		modelAndView.addObject("lastDayOfData", lastDayOfData);
+		modelAndView.addObject("dernierHosp", dhs.lastEntry().getValue().getHosp());
+
+		modelAndView.addObject("dateMin", dateMin);
+		modelAndView.addObject("dateMax", dateMax);
+
+		modelAndView.addObject("dateMinProj", proj.firstKey());
+		modelAndView.addObject("dateMaxProj", proj.lastKey());
+
+		modelAndView.addObject("dhs", dhs);
+		modelAndView.addObject("deltas", deltas);
+		modelAndView.addObject("avgDeltas", avgDeltas);
+		modelAndView.addObject("cumulClasseAges", cumulClasseAges);
+		modelAndView.addObject("proj", proj);
+		modelAndView.addObject("nouveaux", nouveaux);
+		modelAndView.addObject("avgNouveaux", avgNouveaux);
+		
+        return modelAndView;
+	}
+
+	@GetMapping("/dh-rea")
+    public ModelAndView rea() throws Exception {
+		ModelAndView modelAndView = new ModelAndView("dh-rea");
 		Map<String, Object> model = new HashMap<>();
 
 		TreeMap<LocalDate, Dh> dhs = dhDAO.getDhByDay();
@@ -65,183 +147,36 @@ public class DonneesHospitalieresController {
 		LocalDate dateMin = dhs.firstKey().minusDays(1);
 		LocalDate dateMax = lastDayOfData.plusDays(1);
 	
-		TreeMap<LocalDate, Dh> variations = dhDAO.getDeltasDhByDay();
-	
+		TreeMap<LocalDate, Dh> deltas = dhDAO.getDeltasDhByDay();
+			
+		TreeMap<LocalDate, Dh> avgDeltas = DhTools.avgOverAWeek(deltas);
+
 		TreeMap<String, DhClAge> cumulClasseAges = dhClAgeDAO.getCumulClasseAges(lastDayOfData);
 	
-		TreeMap<LocalDate, Double> proj = DhTools.calculPolynomialProjection(variations, "dc");
-	
-		//---- Alimentation du modèle
-	
-		model.put("lastDayOfData", lastDayOfData);
-		model.put("totalDc", dhs.get(lastDayOfData).dc);
-	
-		model.put("dateMin", dateMin);
-		model.put("dateMax", dateMax);
-	
-		model.put("dateMinProj", proj.firstKey());
-		model.put("dateMaxProj", proj.lastKey());
-	
-		model.put("dh", dhs);
-		model.put("variations", variations);
-		model.put("cumulClasseAges", cumulClasseAges);
-		model.put("proj", proj);
-
-		modelAndView.addObject("model", model);
-        return modelAndView;
-    }
-
-	@GetMapping("/dh-hosp")
-    public ModelAndView hosp() throws Exception {
-		ModelAndView modelAndView = new ModelAndView("dh-hosp");
-		Map<String, Object> model = new HashMap<>();
-
-		TreeMap<LocalDate, Dh> dh = dhDAO.getDhByDay();
-		LocalDate lastDayOfData = dh.lastKey();
-		LocalDate dateMin = dh.firstKey().minusDays(1);
-		LocalDate dateMax = lastDayOfData.plusDays(1);
+		TreeMap<LocalDate, Double> proj = DhTools.calculPolynomialProjection(dhs, "rea");
 		
 		TreeMap<LocalDate, Dh> nouveaux = DonneesHospitalieres.getNouveauxByDate(servletContextWrapper.getServletContext());
-
-		TreeMap<String, DhClAge> cumulClasseAges = dhClAgeDAO.getCumulClasseAges(lastDayOfData);
-
-		//---- Projection
-
-		LocalDate dateMinProj = lastDayOfData.minusWeeks(2);
-		LocalDate dateMaxProj = lastDayOfData.plusWeeks(2);
-
-		//---- Projection Linéaire
-
-		SimpleRegression simpleRegression = new SimpleRegression();
-		for (LocalDate jour : dh.keySet()) {
-			if (jour.compareTo(dateMinProj) > 0) {
-				simpleRegression.addData((double) jour.toEpochDay(), (double) dh.get(jour).hosp);
-			}
-		}
-
-		Map<LocalDate, Double> proj = new HashMap<>();
-		for (LocalDate jour = dateMinProj; jour.compareTo(dateMaxProj) <= 0; jour = jour.plusDays(1)) {
-			proj.put(jour, simpleRegression.predict((double) jour.toEpochDay()));
-		}
-
-		//---- Projection Polynomiale
-
-		PolynomialCurveFitter polynomialCurveFitter = PolynomialCurveFitter.create(2);
-		List<WeightedObservedPoint> points = new ArrayList<>();
-
-		for (LocalDate jour : dh.keySet()) {
-			if (jour.compareTo(dateMinProj) >= 0) {
-				points.add(new WeightedObservedPoint(1d, (double) jour.toEpochDay(), (double) dh.get(jour).hosp));
-			}
-		}
-		double[] coeffs = polynomialCurveFitter.fit(points);
-		PolynomialFunction polynomialFunction = new PolynomialFunction(coeffs);
-
-		Map<LocalDate, Double> proj2 = new HashMap<>();
-
-		for (LocalDate jour = dateMinProj; jour.isBefore(dateMaxProj); jour = jour.plusDays(1)) {
-			proj2.put(jour, polynomialFunction.value(jour.toEpochDay()));
-		}
-
-		//---- Calculate total dc
-
-		Dh lastCumul = dh.get(lastDayOfData);
+		
+		TreeMap<LocalDate, Dh> avgNouveaux = DhTools.avgOverAWeek(nouveaux);
 
 		//---- Alimentation du modèle
 
-		model.put("lastDayOfData", lastDayOfData);
-		model.put("dernierHosp", lastCumul.hosp);
+		modelAndView.addObject("lastDayOfData", lastDayOfData);
+		modelAndView.addObject("dernierRea", dhs.lastEntry().getValue().getHosp());
 
-		model.put("dateMin", dateMin);
-		model.put("dateMax", dateMax);
+		modelAndView.addObject("dateMin", dateMin);
+		modelAndView.addObject("dateMax", dateMax);
 
-		model.put("dateMinProj", dateMinProj);
-		model.put("dateMaxProj", dateMaxProj);
+		modelAndView.addObject("dateMinProj", proj.firstKey());
+		modelAndView.addObject("dateMaxProj", proj.lastKey());
 
-		model.put("dh", dh);
-		model.put("nouveaux", nouveaux);
-		model.put("cumulClasseAges", cumulClasseAges);
-		model.put("proj", proj);
-		model.put("proj2", proj2);
-		
-		modelAndView.addObject("model", model);
-        return modelAndView;
-	}
-
-	@GetMapping("/dh-rea")
-    public ModelAndView rea() throws Exception {
-		ModelAndView modelAndView = new ModelAndView("dh-rea");
-		Map<String, Object> model = new HashMap<>();
-		
-		TreeMap<LocalDate, Dh> dh = dhDAO.getDhByDay();
-		LocalDate lastDayOfData = dh.lastKey();
-		LocalDate dateMin = dh.firstKey().minusDays(1);
-		LocalDate dateMax = lastDayOfData.plusDays(1);
-		
-		TreeMap<LocalDate, Dh> nouveaux = DonneesHospitalieres.getNouveauxByDate(servletContextWrapper.getServletContext());
-
-		TreeMap<String, DhClAge> cumulClasseAges = dhClAgeDAO.getCumulClasseAges(lastDayOfData);
-
-		//---- Projection
-
-		LocalDate dateMinProj = lastDayOfData.minusWeeks(2);
-		LocalDate dateMaxProj = lastDayOfData.plusWeeks(2);
-
-		//---- Projection Linéaire
-		
-		SimpleRegression simpleRegression = new SimpleRegression();
-		for (LocalDate jour : dh.keySet()) {
-			if (jour.compareTo(dateMinProj) > 0) {
-				simpleRegression.addData((double) jour.toEpochDay(), (double) dh.get(jour).rea);
-			}
-		}
-
-		Map<LocalDate, Double> proj = new HashMap<>();
-		for (LocalDate jour = dateMinProj; jour.compareTo(dateMaxProj) <= 0; jour = jour.plusDays(1)) {
-			proj.put(jour, simpleRegression.predict((double) jour.toEpochDay()));
-		}
-
-		//---- Projection Polynomiale
-
-		PolynomialCurveFitter polynomialCurveFitter = PolynomialCurveFitter.create(2);
-		List<WeightedObservedPoint> points = new ArrayList<>();
-
-		for (LocalDate jour : dh.keySet()) {
-			if (jour.compareTo(dateMinProj) >= 0) {
-				points.add(new WeightedObservedPoint(1d, (double) jour.toEpochDay(), (double) dh.get(jour).rea));
-			}
-		}
-		double[] coeffs = polynomialCurveFitter.fit(points);
-		PolynomialFunction polynomialFunction = new PolynomialFunction(coeffs);
-
-		Map<LocalDate, Double> proj2 = new HashMap<>();
-
-		for (LocalDate jour = dateMinProj; jour.isBefore(dateMaxProj); jour = jour.plusDays(1)) {
-			proj2.put(jour, polynomialFunction.value(jour.toEpochDay()));
-		}
-
-		//---- Calculate total dc
-
-		Dh lastCumul = dh.get(lastDayOfData);
-
-		//---- Alimentation du modèle
-
-		model.put("lastDayOfData", lastDayOfData);
-		model.put("dernierRea", lastCumul.rea);
-
-		model.put("dateMin", dateMin);
-		model.put("dateMax", dateMax);
-
-		model.put("dateMinProj", dateMinProj);
-		model.put("dateMaxProj", dateMaxProj);
-
-		model.put("dh", dh);
-		model.put("nouveaux", nouveaux);
-		model.put("cumulClasseAges", cumulClasseAges);
-		model.put("proj", proj);
-		model.put("proj2", proj2);
-
-		modelAndView.addObject("model", model);
+		modelAndView.addObject("dhs", dhs);
+		modelAndView.addObject("deltas", deltas);
+		modelAndView.addObject("avgDeltas", avgDeltas);
+		modelAndView.addObject("cumulClasseAges", cumulClasseAges);
+		modelAndView.addObject("proj", proj);
+		modelAndView.addObject("nouveaux", nouveaux);
+		modelAndView.addObject("avgNouveaux", avgNouveaux);
         return modelAndView;
 	}
 
@@ -302,8 +237,8 @@ public class DonneesHospitalieresController {
 			dateMax = nouveaux.lastKey().plusDays(1);
 			
 			for (LocalDate jour : nouveaux.keySet()) {
-				line1Json.add(factory.createArrayBuilder().add(jour.toString()).add(nouveaux.get(jour).hosp));
-				line2Json.add(factory.createArrayBuilder().add(jour.toString()).add(nouveaux.get(jour).rea));
+				line1Json.add(factory.createArrayBuilder().add(jour.toString()).add(nouveaux.get(jour).getHosp()));
+				line2Json.add(factory.createArrayBuilder().add(jour.toString()).add(nouveaux.get(jour).getRea()));
 			}
 			
 			List<Long> testListValues1 = new ArrayList<>();
@@ -311,8 +246,8 @@ public class DonneesHospitalieresController {
 			
 			for (LocalDate jour : nouveaux.keySet()) {
 				if (jour.isAfter(dateMin)) {
-					testListValues1.add(nouveaux.get(jour).hosp);
-					testListValues2.add(nouveaux.get(jour).rea);
+					testListValues1.add(nouveaux.get(jour).getHosp());
+					testListValues2.add(nouveaux.get(jour).getRea());
 				}
 			}
 	
@@ -343,8 +278,8 @@ public class DonneesHospitalieresController {
 			dateMax = nouveaux.lastKey().plusDays(1);
 			
 			for (LocalDate jour : nouveaux.keySet()) {
-				line1Json.add(factory.createArrayBuilder().add(jour.toString()).add(nouveaux.get(jour).hosp));
-				line2Json.add(factory.createArrayBuilder().add(jour.toString()).add(nouveaux.get(jour).rea));
+				line1Json.add(factory.createArrayBuilder().add(jour.toString()).add(nouveaux.get(jour).getHosp()));
+				line2Json.add(factory.createArrayBuilder().add(jour.toString()).add(nouveaux.get(jour).getRea()));
 			}
 			
 			List<Long> testListValues1 = new ArrayList<>();
@@ -352,8 +287,8 @@ public class DonneesHospitalieresController {
 			
 			for (LocalDate jour : nouveaux.keySet()) {
 				if (jour.isAfter(dateMin)) {
-					testListValues1.add(nouveaux.get(jour).hosp);
-					testListValues2.add(nouveaux.get(jour).rea);
+					testListValues1.add(nouveaux.get(jour).getHosp());
+					testListValues2.add(nouveaux.get(jour).getRea());
 				}
 			}
 	

@@ -1,5 +1,7 @@
 package chamette.datasets;
 
+import java.text.DecimalFormat;
+
 import org.apache.log4j.Logger;
 
 public abstract class DatasetHelper {
@@ -31,8 +33,13 @@ public abstract class DatasetHelper {
 		LOGGER.info("Calculate new : "+myDatasetName);
 		Dataset myDataset = new CommonDataset(myDatasetName);
 		
+		long start = System.nanoTime();
 		Object data = calculateData(datasets.get(parentDatasetName).getData());
-
+	
+		long end = System.nanoTime();
+		long duration = Math.round((end-start)/1_000_000);
+		LOGGER.info("> Done in "+DecimalFormat.getInstance().format(duration)+" ms");
+		
 		if (data == null) {
 			throw new Exception("No data");
 		}

@@ -79,10 +79,10 @@ public class DhDAO {
 				for (Map.Entry<LocalDate, Dh> entry : from.entrySet()) {
 					if (prev != null) {
 						ret.put(entry.getKey(), new Dh("", "", entry.getKey(), 
-							entry.getValue().hosp - prev.hosp,
-							entry.getValue().rea  - prev.rea,
-							entry.getValue().rad  - prev.rad,
-							entry.getValue().dc   - prev.dc
+							entry.getValue().getHosp() - prev.getHosp(),
+							entry.getValue().getRea()  - prev.getRea(),
+							entry.getValue().getRad()  - prev.getRad(),
+							entry.getValue().getDc()   - prev.getDc()
 						));
 					}
 					prev = entry.getValue();

@@ -13,8 +13,8 @@
 <div class="container">
 	<div class="row">
 		<div class="col-xl">
-		<h3>Bilan des hospitalisation au ${model.lastDayOfData}</h3>
-		Il y a actuellement <span class="nombre"><fmt:formatNumber value="${model.dernierHosp}" maxFractionDigits="3"/></span> patients hospitalisés.<br>
+		<h3>Bilan des hospitalisation au ${lastDayOfData}</h3>
+		Il y a actuellement <span class="nombre"><fmt:formatNumber value="${dernierHosp}" maxFractionDigits="3"/></span> patients hospitalisés.<br>
 		En 24h, il y a eu <span class="nombre" id="lastAdmissions"></span> admissions
 		et un bilan de <span class="nombre" id="solde"></span>  patients en tenant compte des sorties.<br>
 		En une semaine, il y a eu en moyenne <span class="nombre" id="avgLastAdmissions"></span> hospitalisations par jour
@@ -25,8 +25,8 @@
 
 	<script>
 		//Intervalle complet des datas
-		var dataDateMin = "${model.dateMin}";
-		var dataDateMax = "${model.dateMax}";
+		var dataDateMin = "${dateMin}";
+		var dataDateMax = "${dateMax}";
 	</script>
 		
 	<%@ include file="include_period_selection.jsp"%>
@@ -49,42 +49,26 @@
 
 <script>
 
-var dh = [];
-<c:forEach items="${model.dh}" var="entry">
-	dh.push(['${entry.key}', ${entry.value.hosp}]);
-</c:forEach>
-var barCharts = tsCreateBarChartArray(dh);
-var avgs = tsMoyenneMobile(dh, 7)
+var dhs = [<c:forEach items="${dhs}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.hosp}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var deltas = [<c:forEach items="${deltas}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.hosp}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var avgDeltas = [<c:forEach items="${avgDeltas}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.hosp}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var serieCA = [<c:forEach items="${cumulClasseAges}" var="entry" varStatus="loop">${entry.value.hosp}<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var projection = [<c:forEach items="${proj}" var="entry" varStatus="loop">['${entry.key}', ${entry.value}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var nouveaux = [<c:forEach items="${nouveaux}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.hosp}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var avgNouveaux = [<c:forEach items="${avgNouveaux}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.hosp}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
 
-var deltas = tsDeltaValues(dh);
+var barCharts = tsCreateBarChartArray(dhs);
 var barChartsDeltas = tsCreateBarChartArray(deltas);
-var avgDeltas = tsMoyenneMobile(deltas, 7)
-
-var nouveaux = [];
-<c:forEach items="${model.nouveaux}" var="entry">
-	nouveaux.push(['${entry.key}', ${entry.value.hosp}]);
-</c:forEach>
 var barChartsNouveaux = tsCreateBarChartArray(nouveaux);
-var avgNouveaux = tsMoyenneMobile(nouveaux, 7)
 
 document.getElementById('lastAdmissions').innerHTML = nouveaux[nouveaux.length-1][1];
 document.getElementById('solde').innerHTML = deltas[deltas.length-1][1];
 document.getElementById('avgLastAdmissions').innerHTML = Math.trunc(avgNouveaux[avgNouveaux.length-1][1]);
 document.getElementById('avgSolde').innerHTML = Math.trunc(avgDeltas[avgDeltas.length-1][1]);
 
-var serieCA = [];
-<c:forEach items="${model.cumulClasseAges}" var="entry">
-	serieCA.push(${entry.value.hosp});
-</c:forEach>
-
-var projection = [];
-<c:forEach items="${model.proj2}" var="entry">
-	projection.push(['${entry.key}', ${entry.value}]);
-</c:forEach>
-
 // Projection
-var dateMinProj = "${model.dateMinProj}";
-var dateMaxProj = "${model.dateMaxProj}";
+var dateMinProj = "${dateMinProj}";
+var dateMaxProj = "${dateMaxProj}";
 
 var ticksClasseAges = ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '> 90'];
 
@@ -102,7 +86,7 @@ function dessine() {
 	
 	resizablePlots = [];
 	
-	resizablePlots.push($.jqplot('chart1', [selectValues(dh, dateMin, dateMax)], {
+	resizablePlots.push($.jqplot('chart1', [selectValues(dhs, dateMin, dateMax)], {
 		title:'Hospitalisations', 
 		cursor:standard_cursor,
 		grid: standard_grid,
@@ -158,7 +142,7 @@ function dessine() {
 	delete bilan.axes.y2axis.min;
 	resizablePlots.push($.jqplot("chart3", [selectValues(barChartsDeltas, dateMin, dateMax), selectValues(avgDeltas, dateMin, dateMax)], bilan));
 	
-	resizablePlots.push($.jqplot('chart4', [selectValues(dh, dateMinProj, dateMaxProj), projection], {
+	resizablePlots.push($.jqplot('chart4', [selectValues(dhs, dateMinProj, dateMaxProj), projection], {
 		title:'Tendance', 
 		cursor:standard_cursor,
 		axes:{

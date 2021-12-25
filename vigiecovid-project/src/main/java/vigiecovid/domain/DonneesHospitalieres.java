@@ -60,10 +60,7 @@ public class DonneesHospitalieres {
 				
 				if (ret.containsKey(jour)) {
 					Dh cumul = ret.get(jour);
-					cumul.hosp += valeurs[0];
-					cumul.rea  += valeurs[1];
-					cumul.dc   += valeurs[2];
-					cumul.rad  += valeurs[3];
+					cumul.plus(new Dh("", "", null, valeurs[0], valeurs[1], valeurs[2], valeurs[3])); 
 				} else {
 					logger.debug("jour: "+jour);
 					ret.put(jour, new Dh("", "", null, valeurs[0], valeurs[1], valeurs[2], valeurs[3]));
@@ -137,15 +134,16 @@ public class DonneesHospitalieres {
 				Dh[] cumuls = ret.get(jour);
 				if (cumuls == null) {
 					cumuls = new Dh[11];
-					for (int i=0; i<cumuls.length; i++) cumuls[i] = new Dh();
+					for (int i=0; i<cumuls.length; i++) cumuls[i] = new Dh("", "", null, 0, 0, 0, 0);
 					ret.put(jour, cumuls);
 				}
 				
 				int k = trans[classeAge];
-				cumuls[k].hosp += Long.parseLong(unquote(splits[colHosp]));
-				cumuls[k].rea  += Long.parseLong(unquote(splits[colRea]));
-				cumuls[k].rad  += Long.parseLong(unquote(splits[colRad]));
-				cumuls[k].dc   += Long.parseLong(unquote(splits[colDc]));
+				cumuls[k].plus(new Dh("", "", null,
+						Long.parseLong(unquote(splits[colHosp])),
+						Long.parseLong(unquote(splits[colRea])),
+						Long.parseLong(unquote(splits[colRad])),
+						Long.parseLong(unquote(splits[colDc]))));
 			}
 			count++;
 		}

@@ -13,8 +13,8 @@
 <div class="container">
 	<div class="row">
 		<div class="col-xl">
-		<h3>Décès en millieu hospitalier au ${model.lastDayOfData}</h3>
-		La France cumule <span class="nombre"><fmt:formatNumber value="${model.totalDc}" maxFractionDigits="3"/></span> décès en millieu hospitalier.<br>
+		<h3>Décès en millieu hospitalier au ${lastDayOfData}</h3>
+		La France cumule <span class="nombre"><fmt:formatNumber value="${totalDc}" maxFractionDigits="3"/></span> décès en millieu hospitalier.<br>
 		Il y a eu <span class="nombre" id="lastDc"></span> décès dans les dernières 24 heures
 		et une moyenne de <span class="nombre" id="lastSemaineMoyDc"></span> décès par jour
 		dans la dernières semaine.
@@ -24,8 +24,8 @@
 
 	<script>
 		//Intervalle complet des datas
-		var dataDateMin = "${model.dateMin}";
-		var dataDateMax = "${model.dateMax}";
+		var dataDateMin = "${dateMin}";
+		var dataDateMax = "${dateMax}";
 	</script>
 		
 	<%@ include file="include_period_selection.jsp"%>
@@ -44,20 +44,20 @@
 
 <script>
 
-var dh = [<c:forEach items="${model.dh}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.dc}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
-var deltas = [<c:forEach items="${model.variations}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.dc}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
-var serieCA = [<c:forEach items="${model.cumulClasseAges}" var="entry" varStatus="loop">${entry.value.dc}<c:if test="${not loop.last}">,</c:if></c:forEach>];
-var projection = [<c:forEach items="${model.proj}" var="entry" varStatus="loop">['${entry.key}', ${entry.value}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var dhs = [<c:forEach items="${dhs}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.dc}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var deltas = [<c:forEach items="${deltas}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.dc}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var serieCA = [<c:forEach items="${cumulClasseAges}" var="entry" varStatus="loop">${entry.value.dc}<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var projection = [<c:forEach items="${proj}" var="entry" varStatus="loop">['${entry.key}', ${entry.value}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
+var avgDeltas = [<c:forEach items="${avgDeltas}" var="entry" varStatus="loop">['${entry.key}', ${entry.value.dc}]<c:if test="${not loop.last}">,</c:if></c:forEach>];
 
 var barChartsDeltas = tsCreateBarChartArray(deltas);
-var avgDeltas = tsMoyenneMobile(deltas, 7)
 
 document.getElementById('lastDc').innerHTML = deltas[deltas.length-1][1];
 document.getElementById('lastSemaineMoyDc').innerHTML = Math.trunc(avgDeltas[avgDeltas.length-1][1]);
 
 // Projection
-var dateMinProj = "${model.dateMinProj}";
-var dateMaxProj = "${model.dateMaxProj}";
+var dateMinProj = "${dateMinProj}";
+var dateMaxProj = "${dateMaxProj}";
 
 var ticksClasseAges = ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '> 90'];
 
@@ -75,8 +75,8 @@ function dessine() {
 	
 	resizablePlots = [];
 	
-	resizablePlots.push($.jqplot('chartDc', [selectValues(dh, dateMin, dateMax)], {
-		title:'Décès cumulés (<fmt:formatNumber value="${model.totalDc}" maxFractionDigits="3"/>)', 
+	resizablePlots.push($.jqplot('chartDc', [selectValues(dhs, dateMin, dateMax)], {
+		title:'Décès cumulés (<fmt:formatNumber value="${totalDc}" maxFractionDigits="3"/>)', 
 		cursor:standard_cursor,
 		grid: standard_grid,
 		axes:standard_axes,

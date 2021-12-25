@@ -80,4 +80,25 @@ public class DhToolsTest {
 		
 	}
 
+	@Test
+	public void testAvgOverAWeek() throws Exception {
+		LocalDate fromDate = LocalDate.of(2021, 11, 1);
+		TreeMap<LocalDate, Dh> dhs = new TreeMap<>();
+		for (int i = 0; i< 15; i++) {
+			LocalDate jour = fromDate.plusDays(i);
+			dhs.put(jour, new Dh("01", "1", jour, i, i*10, i*100, i*1000));
+		}
+		
+		TreeMap<LocalDate, Dh> avgs = DhTools.avgOverAWeek(dhs);
+		avgs.entrySet().forEach(LOGGER::debug);
+		
+		assertEquals(9, avgs.size());
+		
+		Dh dh = avgs.get(LocalDate.of(2021, 11, 8));
+		assertEquals(4, dh.getHosp());
+		assertEquals(40, dh.getRea());
+		assertEquals(400, dh.getRad());
+		assertEquals(4000, dh.getDc());
+	}
+
 }

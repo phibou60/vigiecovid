@@ -9,8 +9,11 @@ import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoint;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
+import org.apache.log4j.Logger;
 
 public class DhTools {
+	
+	private static final Logger LOGGER = Logger.getLogger(DhTools.class); 
 	
 	/**
 	 * Calcul projection de l'évolution de l'incidence sous la forme d'un modèle linéaire
@@ -77,6 +80,31 @@ public class DhTools {
 		}
 		
 		return proj;
+	}
+	
+	/**
+	 * Calcule la moyenne mobile sur 7 jours
+	 */
+
+	public static TreeMap<LocalDate, Dh> avgOverAWeek(TreeMap<LocalDate, Dh> parentData)
+			throws Exception {
+		
+		TreeMap<LocalDate, Dh> ret = new TreeMap<>();
+		
+		parentData.entrySet().stream().skip(6).forEach(e -> {
+			LOGGER.debug("e: "+e);
+			Dh sum = e.getValue().clone();
+
+			for (int i = -6; i < 0; i++) {
+				LocalDate k = e.getKey().plusDays(i);
+				Dh toAdd = parentData.get(k);
+				if (toAdd != null) {
+					sum.plus(toAdd);
+				}
+			}
+			ret.put(e.getKey(), sum.avg());
+		});		
+		return ret;
 	}
 
 }
