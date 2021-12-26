@@ -35,7 +35,9 @@ import vigiecovid.domain.dh.DhClAge;
 import vigiecovid.domain.dh.DhClAgeDAO;
 import vigiecovid.domain.dh.DhDAO;
 import vigiecovid.domain.dh.DhTools;
+import vigiecovid.domain.testvir.TestVir;
 import vigiecovid.domain.testvir.TestVirDAO;
+import vigiecovid.domain.testvir.TestVirTools;
 
 @Controller
 public class DonneesHospitalieresController {
@@ -202,130 +204,108 @@ public class DonneesHospitalieresController {
 	}
 
 	@GetMapping("/dh-correl")
-    public ModelAndView correl(@RequestParam(value="correlId", required=false) String correlId) throws Exception {
-		if (correlId == null) {
-			correlId = "adm_hosp_rea";
-		}
+    public ModelAndView correl() throws Exception {
 		
 		ModelAndView modelAndView = new ModelAndView("dh-correl");
-		Map<String, Object> model = new HashMap<>();
+
+		TreeMap<LocalDate, Dh> dhs = dhDAO.getDhByDay();
 		
-		List<Long> listValues1 = null;
-		List<Long> listValues2 = null;
+		LocalDate dateMin = LocalDate.of(2020, 5, 31);
+		LocalDate dateMax = dhs.lastKey().plusDays(1);
 		
 		/*
-		 * Ce code teste l'idée de générer directement du code js par le code java comme modèle.
+		 * Ce code teste l'idée de générer directement du code js par le code java avec l'API JSON.
 		 */
 		JsonBuilderFactory factory = Json.createBuilderFactory(new HashMap<String, Object>());
 		JsonArrayBuilder line1Json = factory.createArrayBuilder();
 		JsonArrayBuilder line2Json = factory.createArrayBuilder();
-		LocalDate dateMin = null;
-		LocalDate dateMax = null;
-	
-		double correl = 0.0d;
-		int decall = 0;
-		String decallMsg = "?";
-		String correlMsg = "?";
 		
-		if (correlId.equalsIgnoreCase("adm_hosp_rea")) {
+		for (LocalDate jour : dhs.keySet()) {
+			line1Json.add(factory.createArrayBuilder().add(jour.toString()).add(dhs.get(jour).getHosp()));
+			line2Json.add(factory.createArrayBuilder().add(jour.toString()).add(dhs.get(jour).getRea()));
+		}
+
+		//---- Essais de plusieurs correlations avec un decallage de jours
+		
+		Map<Integer, Double> scores = new TreeMap<>();
+		
+		for (int decall = -7 ; decall < 7; decall++) {
+			Integer decallJour = decall;
+				
+			List<Double> testListValues1 = new ArrayList<>();
+			List<Double> testListValues2 = new ArrayList<>();
 			
-			correlMsg = "entre les admissions en réanimation et en hospitalisation";
+			dhs.tailMap(dateMin).keySet().stream()
+				.filter(jour -> dhs.containsKey(jour.plusDays(decallJour)))
+				.forEach(jour -> {
+					testListValues1.add((double) dhs.get(jour).getHosp());
+					testListValues2.add((double) dhs.get(jour.plusDays(decallJour)).getRea());
+				});
 			
-			TreeMap<LocalDate, Dh> nouveaux = DonneesHospitalieres.getNouveauxByDate(servletContextWrapper.getServletContext());
-	
-			dateMin = LocalDate.of(2020, 3, 31);
-			dateMax = nouveaux.lastKey().plusDays(1);
-			
-			for (LocalDate jour : nouveaux.keySet()) {
-				line1Json.add(factory.createArrayBuilder().add(jour.toString()).add(nouveaux.get(jour).getHosp()));
-				line2Json.add(factory.createArrayBuilder().add(jour.toString()).add(nouveaux.get(jour).getRea()));
-			}
-			
-			List<Long> testListValues1 = new ArrayList<>();
-			List<Long> testListValues2 = new ArrayList<>();
-			
-			for (LocalDate jour : nouveaux.keySet()) {
-				if (jour.isAfter(dateMin)) {
-					testListValues1.add(nouveaux.get(jour).getHosp());
-					testListValues2.add(nouveaux.get(jour).getRea());
-				}
-			}
-	
 			double[] values1 = new double[testListValues1.size()];
 			double[] values2 = new double[testListValues1.size()];
 			
-			for (int i=0; i < testListValues1.size(); i++) {
+			for (int i = 0; i < values1.length; i++) {
 				values1[i] = testListValues1.get(i);
 				values2[i] = testListValues2.get(i);
 			}
-			correl = new PearsonsCorrelation().correlation(values1, values2);
 			
-			//---- Chosen datas
-			
-			listValues1 = testListValues1;
-			listValues2 = testListValues2;
-			if (decall == 0) {
-				decallMsg = "le même jour";
-			}
-			
-		} else /* if (correlId.equalsIgnoreCase("total_hosp_rea")) */ {
-			
-			correlMsg = "entre le nombre de réanimations et d'hospitalisations";
-			
-			TreeMap<LocalDate, Dh> nouveaux = dhDAO.getDhByDay();
-	
-			dateMin = LocalDate.of(2020, 3, 31);
-			dateMax = nouveaux.lastKey().plusDays(1);
-			
-			for (LocalDate jour : nouveaux.keySet()) {
-				line1Json.add(factory.createArrayBuilder().add(jour.toString()).add(nouveaux.get(jour).getHosp()));
-				line2Json.add(factory.createArrayBuilder().add(jour.toString()).add(nouveaux.get(jour).getRea()));
-			}
-			
-			List<Long> testListValues1 = new ArrayList<>();
-			List<Long> testListValues2 = new ArrayList<>();
-			
-			for (LocalDate jour : nouveaux.keySet()) {
-				if (jour.isAfter(dateMin)) {
-					testListValues1.add(nouveaux.get(jour).getHosp());
-					testListValues2.add(nouveaux.get(jour).getRea());
-				}
-			}
-	
-			double[] values1 = new double[testListValues1.size()];
-			double[] values2 = new double[testListValues1.size()];
-			
-			for (int i=0; i < testListValues1.size(); i++) {
-				values1[i] = testListValues1.get(i);
-				values2[i] = testListValues2.get(i);
-			}
-			correl = new PearsonsCorrelation().correlation(values1, values2);
-			
-			//---- Chosen datas
-			
-			listValues1 = testListValues1;
-			listValues2 = testListValues2;
-			if (decall == 0) {
-				decallMsg = "le même jour";
+			scores.put(decallJour, new PearsonsCorrelation().correlation(values1, values2));
+		}
+		
+		//---- Chose the best correlation
+		
+		double bestCorrel = -99999D;
+		int bestDecall = 0;
+		
+		for (Map.Entry<Integer, Double> e : scores.entrySet()) {
+			if (e.getValue() > bestCorrel) {
+				bestCorrel = e.getValue();
+				bestDecall = e.getKey();
 			}
 		}
+		
+		//---- Information about the best correlation
+		
+		String decallMsg = "?";
+
+		if (bestDecall == 0) {
+			decallMsg = "le même jour entre les réanimations et les hospitalisations";
+		} else if (bestDecall < 0) {
+			decallMsg = "les réanimations en avance de " + -bestDecall + " jour(s) "
+					+ "sur les hospitalisations";
+		} else if (bestDecall > 0) {
+			decallMsg = "les réanimations en retard de " + bestDecall + " jour(s) "
+					+ "sur les hospitalisations";
+		}
+		
+		// ---- Calcul de l'évolution de l'incidence
+		
+		// Population servant au calcul de l'incidence.
+		// C'est la population Française par défaut.
+		long population = 67000000l;
+		
+		TreeMap<LocalDate, TestVir> byWeeks = testVirDAO.cumulTestVirByWeeks(null, true);
+		TreeMap<LocalDate, Integer> incidences
+				= TestVirTools.calculEvolIncidence(byWeeks, population);
+		
+		JsonArrayBuilder incidencesJson = factory.createArrayBuilder();
+		incidences.tailMap(dateMin).forEach((jour, incidence) -> {
+			incidencesJson.add(factory.createArrayBuilder().add(jour.toString()).add(incidence));
+		});
+		
+		//---- Generate the model
 	
 		JsonObjectBuilder root = factory.createObjectBuilder();
 		
-		JsonArrayBuilder nuage = factory.createArrayBuilder();
-		for (int i=0; i< listValues1.size(); i++) {
-			nuage.add(factory.createArrayBuilder().add(listValues1.get(i)).add(listValues2.get(i)));
-		}
-		root.add("nuage", nuage);
-		
 		root.add("line1", line1Json);
 		root.add("line2", line2Json);
+		root.add("incidences", incidencesJson);
 		root.add("dateMin", dateMin.toString());
 		root.add("dateMax", dateMax.toString());
 	
-		root.add("correl", correl);
-		root.add("correlMsg", correlMsg);
-		root.add("decall", decall);
+		root.add("correl", bestCorrel);
+		root.add("decall", bestDecall);
 		root.add("decallMsg", decallMsg);
 		
 		JsonObject jsonModel = root.build();
@@ -335,7 +315,10 @@ public class DonneesHospitalieresController {
 		jsonWriter.writeObject(jsonModel);
 		
 		modelAndView.addObject("model", out.toString());
-        return modelAndView;
+		modelAndView.addObject("scores", scores);
+		modelAndView.addObject("decallMsg", decallMsg);
+		modelAndView.addObject("dateMin", dateMin);
+		return modelAndView;
 	}
 
 	@GetMapping("/dh-repro")
