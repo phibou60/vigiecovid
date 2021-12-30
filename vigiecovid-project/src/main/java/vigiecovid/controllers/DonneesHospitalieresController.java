@@ -164,7 +164,7 @@ public class DonneesHospitalieresController {
 		//---- Alimentation du modèle
 
 		modelAndView.addObject("lastDayOfData", lastDayOfData);
-		modelAndView.addObject("dernierRea", dhs.lastEntry().getValue().getHosp());
+		modelAndView.addObject("dernierRea", dhs.lastEntry().getValue().getRea());
 
 		modelAndView.addObject("dateMin", dateMin);
 		modelAndView.addObject("dateMax", dateMax);

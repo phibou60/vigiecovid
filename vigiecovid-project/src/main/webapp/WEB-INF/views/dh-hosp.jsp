@@ -14,11 +14,13 @@
 	<div class="row">
 		<div class="col-xl">
 		<h3>Bilan des hospitalisation au ${lastDayOfData}</h3>
-		Il y a actuellement <span class="nombre"><fmt:formatNumber value="${dernierHosp}" maxFractionDigits="3"/></span> patients hospitalisés.<br>
-		En 24h, il y a eu <span class="nombre" id="lastAdmissions"></span> admissions
-		et un bilan de <span class="nombre" id="solde"></span>  patients en tenant compte des sorties.<br>
-		En une semaine, il y a eu en moyenne <span class="nombre" id="avgLastAdmissions"></span> hospitalisations par jour
-		et un bilan de <span class="nombre" id="avgSolde"></span> patients en tenant compte des sorties.
+		Il y a actuellement <span class="nombre">
+		  <fmt:formatNumber value="${dernierHosp}" maxFractionDigits="3"/>
+		</span> patients hospitalisés
+		soit <span class="nombre" id="solde"></span> patients par rapport à la veille.
+		<br>
+		En 24h, il y a eu <span class="nombre" id="lastAdmissions"></span> admissions et
+		<span class="nombre" id="sorties"></span> sorties et <span class="nombre" id="dc"></span> décès.
 		</div>
 	</div>
 	<br>
@@ -61,10 +63,15 @@ var barCharts = tsCreateBarChartArray(dhs);
 var barChartsDeltas = tsCreateBarChartArray(deltas);
 var barChartsNouveaux = tsCreateBarChartArray(nouveaux);
 
-document.getElementById('lastAdmissions').innerHTML = nouveaux[nouveaux.length-1][1];
-document.getElementById('solde').innerHTML = deltas[deltas.length-1][1];
-document.getElementById('avgLastAdmissions').innerHTML = Math.trunc(avgNouveaux[avgNouveaux.length-1][1]);
-document.getElementById('avgSolde').innerHTML = Math.trunc(avgDeltas[avgDeltas.length-1][1]);
+let lastAdmissions = nouveaux[nouveaux.length-1][1];
+let solde = deltas[deltas.length-1][1];
+let dc = ${deltas[lastDayOfData].dc};
+let sorties = lastAdmissions - solde - dc;
+
+document.getElementById('lastAdmissions').innerHTML = formatInteger(lastAdmissions);
+document.getElementById('solde').innerHTML = formatDeltaInteger(solde);
+document.getElementById('sorties').innerHTML = formatInteger(sorties);
+document.getElementById('dc').innerHTML = formatInteger(dc);
 
 // Projection
 var dateMinProj = "${dateMinProj}";
@@ -87,7 +94,7 @@ function dessine() {
 	resizablePlots = [];
 	
 	resizablePlots.push($.jqplot('chart1', [selectValues(dhs, dateMin, dateMax)], {
-		title:'Hospitalisations', 
+		title:'Hospitalisations en cours', 
 		cursor:standard_cursor,
 		grid: standard_grid,
 		axes:standard_axes,
@@ -117,7 +124,7 @@ function dessine() {
 	
 	//----------------------------------------------------------
 	var bilan = {
-		title:'Bilan avec les sorties', 
+		title:'Hospitalisations en +/-', 
 		cursor:standard_cursor,
 		grid: standard_grid,
 		axes:standard_axes,

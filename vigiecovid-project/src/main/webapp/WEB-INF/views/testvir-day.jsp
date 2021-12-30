@@ -24,12 +24,15 @@
 	au ${model.lastDayOfData}
 	</h2>
 	<p>
-		Il y a eu <span class="nombre" id="lastPositifs"></span> cas positifs dans les dernières 24h.<br>
-		Sur une semaine, il y a en moyenne <span class="nombre" id="lastPositifsSemaine"></span> cas positifs par jour.<br>
-		L'incidence est actuellement de <span class="nombre" id="lastIncid"> (cas positifs par semaine pour 100.000 personnes)</span>
-	</p>
-	<p>	
-		Sur la dernière semaine, il y a eu <span class="nombre" id="lastTestsSemaine"></span> tests effectués.
+		Il y a eu <span class="nombre" id="lastPositifs"></span> cas positifs dans les dernières 24h.
+		<br>
+		Sur une semaine, il y a en moyenne <span class="nombre" id="lastAvgPositifsSemaine"></span>
+		cas positifs par jour.<br>
+		L'incidence est actuellement de <span class="nombre" id="lastIncid"></span>
+		(cas positifs par semaine pour 100.000 personnes)</span>
+    <br>
+		Sur la dernière semaine, il y a eu <span class="nombre" id="lastTestsSemaine"></span>
+		tests effectués et <span class="nombre" id="lastPositifsSemaine"></span> personnes positives.
 	</p>
 
 	<script>
@@ -70,10 +73,11 @@ var projection = [<c:forEach items="${model.proj}" var="entry" varStatus="loop">
 var testsCharts = tsCreateBarChartArray(tests);
 var positifsCharts = tsCreateBarChartArray(positifs);
 
-document.getElementById('lastPositifs').innerHTML = new Intl.NumberFormat().format(positifs[positifs.length-1][1]);
-document.getElementById('lastIncid').innerHTML = new Intl.NumberFormat().format(Math.round(incidences[incidences.length-1][1]));
-document.getElementById('lastPositifsSemaine').innerHTML = new Intl.NumberFormat().format(Math.round(avgPositifs[avgPositifs.length-1][1]));
-document.getElementById('lastTestsSemaine').innerHTML = new Intl.NumberFormat().format(testsSemaine[testsSemaine.length-1][1]);
+document.getElementById('lastPositifs').innerHTML = formatInteger(positifs[positifs.length-1][1]);
+document.getElementById('lastIncid').innerHTML = formatInteger(Math.round(incidences[incidences.length-1][1]));
+document.getElementById('lastAvgPositifsSemaine').innerHTML = formatInteger(Math.round(avgPositifs[avgPositifs.length-1][1]));
+document.getElementById('lastTestsSemaine').innerHTML = formatInteger(testsSemaine[testsSemaine.length-1][1]);
+document.getElementById('lastPositifsSemaine').innerHTML = formatInteger(${model.byWeeks[model.lastDayOfData].positifs});
 
 //Projection
 var dateMinProj = projection[0][0];

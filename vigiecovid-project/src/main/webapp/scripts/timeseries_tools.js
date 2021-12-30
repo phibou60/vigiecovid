@@ -141,3 +141,17 @@ function tsAddDays(date, days) {
 	result.setDate(result.getDate() + days);
 	return result;
 }
+
+
+function formatInteger(value) {
+  return new Intl.NumberFormat('fr-FR', {}).format(value);
+}
+
+function formatDeltaInteger(value) {
+  let res = formatInteger(value);
+  if (value > 0) {
+    res = "+" + res;
+  }
+  return res;
+}
+

@@ -14,11 +14,14 @@
 	<div class="row">
 		<div class="col-xl">
 		<h3>Bilan des réanimations au ${lastDayOfData}</h3>
-		Il y a actuellement <span class="nombre"><fmt:formatNumber value="${dernierRea}" maxFractionDigits="3"/></span> patients en réanimations.<br>
+		Il y a actuellement <span class="nombre">
+		  <fmt:formatNumber value="${dernierRea}" maxFractionDigits="3"/>
+		</span> patients en réanimations.<br>
 		En 24h, il y a eu <span class="nombre" id="lastAdmissions"></span> admissions
-		et un bilan de <span class="nombre" id="solde"></span>  patients en tenant compte des sorties.<br>
-		En une semaine, il y a eu en moyenne <span class="nombre" id="avgLastAdmissions"></span> admissions en réanimations par jour
-		et un bilan de <span class="nombre" id="avgSolde"></span> patients en tenant compte des sorties.
+		soit <span class="nombre" id="solde"></span>  patients en tenant compte des sorties.
+		<br>
+		En une semaine, il y a eu en moyenne <span class="nombre" id="avgLastAdmissions"></span>
+		 admissions en réanimations par jour.
 		</div>
 	</div>
 	<br>
@@ -61,10 +64,13 @@ var barCharts = tsCreateBarChartArray(dhs);
 var barChartsDeltas = tsCreateBarChartArray(deltas);
 var barChartsNouveaux = tsCreateBarChartArray(nouveaux);
 
-$('#lastAdmissions').html(nouveaux[nouveaux.length-1][1]);
-$('#solde').html(deltas[deltas.length-1][1]);
-$('#avgLastAdmissions').html(Math.trunc(avgNouveaux[avgNouveaux.length-1][1]));
-$('#avgSolde').html(Math.trunc(avgDeltas[avgDeltas.length-1][1]));
+let lastAdmissions = nouveaux[nouveaux.length-1][1];
+let solde = deltas[deltas.length-1][1];
+let avgLastAdmissions = Math.trunc(avgNouveaux[avgNouveaux.length-1][1]);
+
+document.getElementById('lastAdmissions').innerHTML = formatInteger(lastAdmissions);
+document.getElementById('solde').innerHTML = formatDeltaInteger(solde);
+document.getElementById('avgLastAdmissions').innerHTML = formatInteger(avgLastAdmissions);
 
 // Projection
 var dateMinProj = "${dateMinProj}";
@@ -119,7 +125,7 @@ function dessine() {
 	
 	//----------------------------------------------------------
 	var bilan = {
-		title:'Bilan avec les sorties', 
+		title:'Réanimations en +/-', 
 		cursor:standard_cursor,
 		grid: standard_grid,
 		axes:standard_axes,
