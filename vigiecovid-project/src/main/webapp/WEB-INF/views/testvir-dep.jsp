@@ -53,7 +53,7 @@
 
 	<script>
 		var colorIncids = ["LimeGreen", "greenyellow", "#feff31", "#ffdb33", "#ffb734", "#ff9234", "#ff6933", "#fe3231", "crimson"];
-		var incidLevels = [	              10,            50,        100,       150,       250,       400,       700,       1000];
+		var incidLevels = [	              10,            50,        100,       250,       500,       1000,       2000,       5000];
 	</script>
 	
 	<div class="row">
@@ -89,9 +89,16 @@
 		<script>
 			for (var i=0; i<levelsColorsV.length; i++) {
 				document.write("<span class='badge' style='background:"+levelsColorsV[i]+";'>");
-				if (i == 0) document.write(" &lt; "+levelsValuesV[i]);
-				if (i > 0 && i < levelsValuesV.length) document.write(" de "+levelsValuesV[i-1]+" à "+levelsValuesV[i]);
-				if (i == levelsColorsV.length-1) document.write(" &gt; "+levelsValuesV[i-1]);
+				if (i == 0) {
+					document.write(" &lt; "+formatDeltaInteger(levelsValuesV[i]));
+				}
+				if (i > 0 && i < levelsValuesV.length) {
+					document.write(" de "+formatDeltaInteger(levelsValuesV[i-1])
+							+" à "+formatDeltaInteger(levelsValuesV[i]));
+				}
+				if (i == levelsColorsV.length-1) {
+					document.write(" &gt; "+formatDeltaInteger(levelsValuesV[i-1]));
+				}
 				document.write("</span>&nbsp;");
 			}
 		</script>
