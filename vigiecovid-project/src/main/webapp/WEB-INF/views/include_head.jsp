@@ -20,28 +20,28 @@
 	<link href="../modules/bootstrap-4.5.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
 	
 	<!-- JQuery -->
-	<script src="../modules/jquery/jquery.min.js"></script>
+	<script src="../modules/jquery/jquery.min.js?version=${applicationScope.version}"></script>
 	
 	<!-- Bootstrap JS -->
-	<script src="../modules/popper/popper.min.js"></script>
+	<script src="../modules/popper/popper.min.js?version=${applicationScope.version}"></script>
 	<script src="../modules/bootstrap-4.5.2-dist/js/bootstrap.min.js"></script>
 	 
 	<!-- JQPlot -->
-	<script src="../modules/jqplot/jquery.jqplot.min.js"></script>
-	<script src="../modules/jqplot/plugins/jqplot.dateAxisRenderer.js"></script>
-	<script src="../modules/jqplot/plugins/jqplot.categoryAxisRenderer.js"></script>
-	<script src="../modules/jqplot/plugins/jqplot.cursor.js"></script>
-	<script src="../modules/jqplot/plugins/jqplot.highlighter.js"></script>
-	<script src="../modules/jqplot/plugins/jqplot.barRenderer.js"></script>
-	<script src="../modules/jqplot/plugins/jqplot.ohlcRenderer.js"></script>
-	<script src="../modules/jqplot/plugins/jqplot.canvasOverlay.js"></script>
-	<link  href="../modules/jqplot/jquery.jqplot.min.css" rel="stylesheet">
+	<script src="../modules/jqplot/jquery.jqplot.min.js?version=${applicationScope.version}"></script>
+	<script src="../modules/jqplot/plugins/jqplot.dateAxisRenderer.js?version=${applicationScope.version}"></script>
+	<script src="../modules/jqplot/plugins/jqplot.categoryAxisRenderer.js?version=${applicationScope.version}"></script>
+	<script src="../modules/jqplot/plugins/jqplot.cursor.js?version=${applicationScope.version}"></script>
+	<script src="../modules/jqplot/plugins/jqplot.highlighter.js?version=${applicationScope.version}"></script>
+	<script src="../modules/jqplot/plugins/jqplot.barRenderer.js?version=${applicationScope.version}"></script>
+	<script src="../modules/jqplot/plugins/jqplot.ohlcRenderer.js?version=${applicationScope.version}"></script>
+	<script src="../modules/jqplot/plugins/jqplot.canvasOverlay.js?version=${applicationScope.version}"></script>
+	<link  href="../modules/jqplot/jquery.jqplot.min.css?version=${applicationScope.version}" rel="stylesheet">
 	
 	<!-- Site style -->
-	<link href="../theme/style.css?version=4" rel="stylesheet"/>
+	<link href="../theme/style.css?version=${applicationScope.version}" rel="stylesheet"/>
 	<link href="../theme/favicon.ico" rel="icon"/>
 
-	<script src="../scripts/timeseries_tools.js?version=1"></script>
-	<script src="../scripts/cookies_tool.js"></script>
+	<script src="../scripts/timeseries_tools.js?version=${applicationScope.version}"></script>
+	<script src="../scripts/cookies_tool.js?version=${applicationScope.version}"></script>
 	
 	

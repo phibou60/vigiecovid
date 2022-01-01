@@ -1,6 +1,7 @@
 package vigiecovid;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
@@ -28,6 +29,8 @@ public class InitWebApp extends HttpServlet {
 			ServletContext context = config.getServletContext(); 
 			dumpConfig(context);			
 			downloadDatasets(context);
+			
+			context.setAttribute("version", new Date().getTime());
 		
 			LOGGER.info("Servlet initialization terminated");
 			
