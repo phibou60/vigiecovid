@@ -115,6 +115,7 @@ public class DonneesHospitalieresController {
 
 		modelAndView.addObject("lastDayOfData", lastDayOfData);
 		modelAndView.addObject("dernierHosp", dhs.lastEntry().getValue().getHosp());
+		modelAndView.addObject("dc", deltas.lastEntry().getValue().getDc());
 
 		modelAndView.addObject("dateMin", dateMin);
 		modelAndView.addObject("dateMax", dateMax);
