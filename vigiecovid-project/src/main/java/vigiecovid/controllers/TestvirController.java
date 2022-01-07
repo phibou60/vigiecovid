@@ -20,6 +20,8 @@ import vigiecovid.domain.testvir.TestVirTools;
 @Controller
 public class TestvirController {
 
+	Logger LOGGER = Logger.getLogger(TestvirController.class);
+
 	@Autowired
 	private TestVirDAO testVirDAO;	
 
@@ -30,12 +32,15 @@ public class TestvirController {
     public ModelAndView day(@RequestParam(value="dep", required=false) String dep,
     		@RequestParam(value="lib", required=false) String lib) throws Exception {
 		ModelAndView modelAndView = new ModelAndView("testvir-day");
-
-		Logger logger = Logger.getLogger(this.getClass());
 		
 		Map<String, Object> model = new HashMap<>();
 	
-		TreeMap<LocalDate, TestVir> byDays = testVirDAO.cumulTestVirByDay(dep, true);
+		TreeMap<LocalDate, TestVir> byDays;
+		if (dep != null) {
+			byDays = testVirDAO.cumulTestVirByDay(dep, true);
+		} else {
+			byDays = testVirDAO.cumulTestVirByDay();
+		}
 	
 		LocalDate lastDayOfData = byDays.lastKey();
 		LocalDate dateMin = byDays.firstKey().minusDays(1);
@@ -58,7 +63,7 @@ public class TestvirController {
 	
 		// Calcul de l'évolution de l'incidence
 		
-		TreeMap<LocalDate, TestVir> byWeeks = testVirDAO.cumulTestVirByWeeks(dep, true);
+		TreeMap<LocalDate, TestVir> byWeeks = testVirDAO.cumulTestVirByWeeks(byDays);
 		TreeMap<LocalDate, Integer> incidences
 				= TestVirTools.calculEvolIncidence(byWeeks, population);
 		
@@ -82,8 +87,6 @@ public class TestvirController {
 	@GetMapping("/testvir-dep")
     public ModelAndView dep(@RequestParam(value="day", required=false) String paramDay) throws Exception {
 		ModelAndView modelAndView = new ModelAndView("testvir-dep");
-
-		Logger logger = Logger.getLogger(this.getClass());
 
 		Map<String, Object> model = new HashMap<>();
 

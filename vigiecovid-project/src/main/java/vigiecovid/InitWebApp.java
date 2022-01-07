@@ -92,6 +92,8 @@ public class InitWebApp extends HttpServlet {
 				"5e7e104ace2080d9162b61d8", "08c18e08-6780-452d-9b8c-ae244ad529b3", mode, folder));
 		datasets.add(new DataGouvFrDownloader("sp-pos-quot-dep", "5ed117db6c161bd5baf070be",
 				"406c6a23-e283-4300-9484-54e78c8ae675", mode, folder));
+		datasets.add(new DataGouvFrDownloader("sp-pos-quot-fra", "5ed117db6c161bd5baf070be",
+				"dd0de5d9-b5a5-4503-930a-7b08dc0adc7c", mode, folder));
 		datasets.add(new DataGouvFrDownloader("sursaud-covid19-quotidien-departement", "5e74ecf52eb7514f2d3b8845",
 				"eceb9fb4-3ebc-4da3-828d-f5939712600a", mode, folder));
 	

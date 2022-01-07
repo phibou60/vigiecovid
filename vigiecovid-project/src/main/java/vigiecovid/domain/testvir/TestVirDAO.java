@@ -7,6 +7,8 @@ import static chamette.tools.CsvTools.unquote;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.ServletContext;
 
@@ -17,7 +19,9 @@ import org.springframework.stereotype.Component;
 import chamette.datascience.Calculs;
 import chamette.datasets.CommonDataset;
 import chamette.datasets.Dataset;
+import chamette.datasets.DatasetHelper;
 import chamette.datasets.Datasets;
+
 import vigiecovid.domain.vacsi.VacsiDAO;
 
 @Component
@@ -26,6 +30,7 @@ public class TestVirDAO {
 	private final Logger LOGGER = Logger.getLogger(VacsiDAO.class);
 
 	private ServletContext context;
+	private Datasets datasets;
 
 	public TestVirDAO(@Autowired ServletContext context) {
 		super();
@@ -85,7 +90,7 @@ public class TestVirDAO {
 			if (count == 0) sep = getSeparator(line);
 			
 			String[] splits = line.split(sep);
-			if (count > 0 && splits[4].equals("0")) {
+			if (count > 0 && splits.length > 4 && splits[4].equals("0")) {
 				
 				String cle = splits[0];
 				LocalDate date = LocalDate.parse(normalizeDate(unquote(splits[1])));
@@ -161,7 +166,8 @@ public class TestVirDAO {
 			
 			String[] splits = line.split(sep);
 
-			if (count > 0 && splits[4].equals("0") && ((dep == null && (!metropoleSeule || (metropoleSeule && splits[0].length() == 2))) || splits[0].equals(dep))) {
+			if (count > 0 && splits.length > 4 && splits[4].equals("0") 
+					&& ((dep == null && (!metropoleSeule || (metropoleSeule && splits[0].length() == 2))) || splits[0].equals(dep))) {
 				
 				LocalDate jour = LocalDate.parse(normalizeDate(unquote(splits[1])));
 				
@@ -195,16 +201,11 @@ public class TestVirDAO {
 	/**
 	 * Retourne les tests virologiques par semaine (avec possibilité de filtrer sur le département).
 	 * 
-	 * @param context Permet d'accéder aux Datasets
-	 * @param dep Département (facultatif. Peut être null)
-	 * @param metropoleSeule true indique que l'on veut uniquement les données de la métropole
-	 * @return Un tableau des tests virologiques par semaine (la journée indique le dernier jour)
-	 * @throws Exception
+	 * @param byDays Tests virologiques par jour
 	 */
-	public TreeMap<LocalDate, TestVir> cumulTestVirByWeeks(String dep,
-			boolean metropoleSeule) throws Exception {
+	public TreeMap<LocalDate, TestVir> cumulTestVirByWeeks(TreeMap<LocalDate, TestVir> byDays)
+			throws Exception {
 		
-		TreeMap<LocalDate, TestVir> byDays = cumulTestVirByDay(dep, metropoleSeule);
 		TreeMap<LocalDate, TestVir> ret = new TreeMap<>();
 		
 		for (Map.Entry<LocalDate, TestVir> entry : byDays.entrySet()) {
@@ -221,6 +222,23 @@ public class TestVirDAO {
 		}
 		
 		return ret;
+	}
+
+	/**
+	 * Retourne les tests virologiques par semaine (avec possibilité de filtrer sur le département).
+	 * 
+	 * @param context Permet d'accéder aux Datasets
+	 * @param dep Département (facultatif. Peut être null)
+	 * @param metropoleSeule true indique que l'on veut uniquement les données de la métropole
+	 * @return Un tableau des tests virologiques par semaine (la journée indique le dernier jour)
+	 * @throws Exception
+	 */
+	public TreeMap<LocalDate, TestVir> cumulTestVirByWeeks(String dep,
+			boolean metropoleSeule) throws Exception {
+		
+		TreeMap<LocalDate, TestVir> byDays = cumulTestVirByDay(dep, metropoleSeule);
+				
+		return cumulTestVirByWeeks(byDays);
 	}
 
 	/**
@@ -281,6 +299,44 @@ public class TestVirDAO {
 		}
 		return ret;
 	}
+	
+	/**
+	 * Liste des tests virologiques par jour.
+	 * @throws Exception 
+	 */
 
+	public TreeMap<LocalDate, TestVir> cumulTestVirByDay() throws Exception {
+		
+		DatasetHelper helper = new DatasetHelper(getDatasets(), "cumulTestVirByDay",
+				"sp-pos-quot-fra") {
+			
+			@Override
+			public Object calculateData(Object parentData) throws Exception {
+				String[] lines = (String[]) parentData;
+				
+				TestVirQuotFraParser parser = new TestVirQuotFraParser(lines[0]);
+				
+				Map<LocalDate, TestVir> map = Stream.of(lines)
+					.skip(1)
+					.filter(l -> l.indexOf(";0;") > 20)
+					.flatMap(l -> parser.parseToStream(l))
+					.collect(Collectors.toMap(t -> t.getJour(), t -> t));
+				
+				return new TreeMap<LocalDate, TestVir>(map);
+			}
+		};
+		return (TreeMap<LocalDate, TestVir>) helper.getData();
+	}
+	
+	public void setDatasets(Datasets datasets) {
+		this.datasets = datasets;
+	}
+
+	private Datasets getDatasets() {
+		if (datasets == null && context != null) { 
+			datasets = (Datasets) context.getAttribute("datasets");
+		}
+		return datasets;
+	}
 	
 }
