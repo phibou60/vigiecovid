@@ -27,7 +27,7 @@ import vigiecovid.domain.vacsi.VacsiDAO;
 @Component
 public class TestVirDAO {
 
-	private final Logger LOGGER = Logger.getLogger(VacsiDAO.class);
+	private static final Logger LOGGER = Logger.getLogger(VacsiDAO.class);
 
 	private ServletContext context;
 	private Datasets datasets;

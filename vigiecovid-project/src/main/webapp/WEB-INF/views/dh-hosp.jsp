@@ -65,7 +65,7 @@ var barChartsNouveaux = tsCreateBarChartArray(nouveaux);
 
 let lastAdmissions = nouveaux[nouveaux.length-1][1];
 let solde = deltas[deltas.length-1][1];
-let dc = ${deltas[lastDayOfData].dc};
+let dc = ${dc};
 let sorties = lastAdmissions - solde - dc;
 
 document.getElementById('lastAdmissions').innerHTML = formatInteger(lastAdmissions);

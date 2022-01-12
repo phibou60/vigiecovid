@@ -38,6 +38,7 @@ public class DownloadEngine extends TimerTask {
 		checkUpdate();
 	}
 	
+	@Override
 	public boolean cancel() {
 		setCancel = true;
 		return super.cancel();

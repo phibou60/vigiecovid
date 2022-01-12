@@ -16,7 +16,6 @@ public class Datasets {
 
 	 // We use ConcurrentHashMap because of concurrent access
 	private Map<String, Dataset> datasets = new ConcurrentHashMap<>();
-	private DownloadEngine downloadEngine;
 	private Timer timer;
 	private Logger logger;
 	
@@ -75,7 +74,7 @@ public class Datasets {
 	 * Delete Children datasets if a new version of data is set for this object.
 	 */
 	public Datasets removeChildrenDatasets(Dataset dataset) {
-		if (dataset.getChildren().size() == 0) {
+		if (dataset.getChildren().isEmpty()) {
 			logger.info("Remove child Datasets of "+dataset.getName()+": none");
 		} else {
 			logger.info("Remove child Datasets of "+dataset.getName()+": ");
@@ -91,7 +90,7 @@ public class Datasets {
 	 * Start the download engine
 	 */
 	public Datasets startRefreshEngine() {
-		downloadEngine = new DownloadEngine(this);
+		DownloadEngine downloadEngine = new DownloadEngine(this);
 		downloadEngine.checkUpdate();
 		
 		//--------------------------------------------------
@@ -99,7 +98,7 @@ public class Datasets {
 		//--------------------------------------------------
 		
 		timer = new Timer(true); 
-		long delay = 1000*60*60; // one hour
+		long delay = 1000L*60*60; // one hour
 		long period = delay;
 
 		timer.scheduleAtFixedRate(downloadEngine, delay, period);
@@ -115,7 +114,6 @@ public class Datasets {
 			if (timer != null) timer.cancel();
 		} catch (Exception e) {
 			logger.info("Exception in timer.cancel: "+e);
-			e.printStackTrace(System.out);
 		}
 	}
 	
