@@ -18,11 +18,12 @@ import chamette.datasets.Datasets;
 public class InitWebApp extends HttpServlet { 
     
 	private static final Logger LOGGER = Logger.getLogger(InitWebApp.class);
+	private Datasets datasets;
 	
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		
-		LOGGER.info("********* Webapp initialization at " + LocalDateTime.now() + " *********");
+		LOGGER.info("********* Webapp initialization at " + LocalDateTime.now() + " * ********");
 		
 		Locale.setDefault(new Locale("fr", "FR"));
 		
@@ -73,7 +74,7 @@ public class InitWebApp extends HttpServlet {
 
 	private void downloadDatasets(ServletContext context) {
 	
-		Datasets datasets = new Datasets();
+		datasets = new Datasets();
 		context.setAttribute("datasets", datasets);
 		
 		String mode = System.getenv("VIGIECOVID_MODE");
@@ -99,8 +100,16 @@ public class InitWebApp extends HttpServlet {
 		datasets.add(new DataGouvFrDownloader("vacsi-a-fra", "6010206e7aa742eb447930f7",
 				"54dd5f8d-1e2e-4ccb-8fb8-eac68245befd", mode, folder));
 		
-		datasets.startRefreshEngine();
+		datasets.startDownloadEngine();
 		
 	}
+
+	@Override
+	public void destroy() {
+		LOGGER.info("********* Webapp detroy at " + LocalDateTime.now() + " *********");
+		datasets.stopDownloadEngine();
+	}
+	
+	
 	
 }

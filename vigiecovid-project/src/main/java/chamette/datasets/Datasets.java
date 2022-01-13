@@ -89,7 +89,7 @@ public class Datasets {
 	/**
 	 * Start the download engine
 	 */
-	public Datasets startRefreshEngine() {
+	public Datasets startDownloadEngine() {
 		DownloadEngine downloadEngine = new DownloadEngine(this);
 		downloadEngine.checkUpdate();
 		
