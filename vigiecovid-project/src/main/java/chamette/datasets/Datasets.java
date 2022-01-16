@@ -14,14 +14,11 @@ import org.apache.log4j.Logger;
  */
 public class Datasets {
 
+	private static final Logger LOGGER = Logger.getLogger(Datasets.class);
+	
 	 // We use ConcurrentHashMap because of concurrent access
 	private Map<String, Dataset> datasets = new ConcurrentHashMap<>();
 	private Timer timer;
-	private Logger logger;
-	
-	public Datasets() {
-		logger = Logger.getLogger(this.getClass());
-	}
 	
 	/**
 	 * Check if this Dataset exists in the collection
@@ -55,7 +52,7 @@ public class Datasets {
 	 * @return
 	 */
 	public Dataset add(Dataset dataset) {
-		logger.info("Add Dataset: "+dataset.getName());
+		LOGGER.info("Add Dataset: "+dataset.getName());
 		return datasets.put(dataset.getName(), dataset);
 	}
 	
@@ -66,7 +63,8 @@ public class Datasets {
 	 */
 	public Datasets remove(Dataset dataset) {
 		Dataset removed = datasets.remove(dataset.getName());
-		logger.info("Remove Dataset: "+dataset.getName()+" => "+(removed==null?"Unknown !!":"done"));
+		LOGGER.info("Remove Dataset: "+dataset.getName()+" => "+(removed==null?"Unknown !!":"done"));
+		removeChildrenDatasets(dataset);
 		return this;
 	}
 	
@@ -75,12 +73,12 @@ public class Datasets {
 	 */
 	public Datasets removeChildrenDatasets(Dataset dataset) {
 		if (dataset.getChildren().isEmpty()) {
-			logger.info("Remove child Datasets of "+dataset.getName()+": none");
+			LOGGER.info("Remove child Datasets of "+dataset.getName()+": none");
 		} else {
-			logger.info("Remove child Datasets of "+dataset.getName()+": ");
+			LOGGER.info("Remove child Datasets of "+dataset.getName()+": ");
 			for (Dataset child : dataset.getChildren()) {
 				remove(child);
-				logger.info(" > "+child.getName());
+				LOGGER.info(" > "+child.getName());
 			}
 		}
 		return this;
@@ -113,7 +111,7 @@ public class Datasets {
 		try {
 			if (timer != null) timer.cancel();
 		} catch (Exception e) {
-			logger.info("Exception in timer.cancel: "+e);
+			LOGGER.info("Exception in timer.cancel: "+e);
 		}
 	}
 	
