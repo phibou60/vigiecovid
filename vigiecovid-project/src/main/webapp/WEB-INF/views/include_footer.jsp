@@ -27,7 +27,10 @@
 					</li>
 				</ul>
 				<hr>
-				<b>Contacts :</b><br> email : philippe.bouvart.pro@gmail.com <br>
+				<p>Auteur:</p>
+				<address>
+          <a href="mailto:philippe.bouvart.pro@gmail.com">philippe.bouvart.pro@gmail.com</a>
+        </address>
 				<a href="https://www.linkedin.com/in/philippe-bouvart-307b3275"
 					target="_blank">
 					<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/240px-LinkedIn_logo_initials.png"
