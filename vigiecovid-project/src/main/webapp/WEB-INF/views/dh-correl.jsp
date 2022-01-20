@@ -39,7 +39,9 @@
 	  </table>
 	</div>
   <div class="row">
-    <h3>Corrélation entre le nombre de réanimations et l'incidence</h3>
+     <h3>Corrélation entre le nombre de réanimations et l'incidence</h3>
+  </div>
+  <div class="row">
     <div class="col-xl tuile"><div id="chart2"></div></div>
   </div>
 </div>
