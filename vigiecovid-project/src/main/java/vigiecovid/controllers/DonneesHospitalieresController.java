@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.json.Json;
@@ -23,8 +24,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import chamette.datascience.Calculs;
-import vigiecovid.domain.DonneesHospitalieres;
-import vigiecovid.domain.ServletContextWrapper;
 import vigiecovid.domain.dh.Dh;
 import vigiecovid.domain.dh.DhClAge;
 import vigiecovid.domain.dh.DhClAgeDAO;
@@ -36,9 +35,8 @@ import vigiecovid.domain.testvir.TestVirTools;
 
 @Controller
 public class DonneesHospitalieresController {
-
-	@Autowired
-	private ServletContextWrapper servletContextWrapper;	
+	
+	private static final Logger LOGGER = Logger.getLogger(DonneesHospitalieresController.class);
 
 	@Autowired
 	private DhDAO dhDAO;
@@ -48,26 +46,24 @@ public class DonneesHospitalieresController {
 
 	@Autowired
 	private TestVirDAO testVirDAO;
-	
-	private static final Logger LOGGER = Logger.getLogger(DonneesHospitalieresController.class);
 
 	@GetMapping("/dh-dc")
     public ModelAndView dc() throws Exception {
 		ModelAndView modelAndView = new ModelAndView("dh-dc");
 
-		TreeMap<LocalDate, Dh> dhs = dhDAO.getDhByDay();
+		SortedMap<LocalDate, Dh> dhs = dhDAO.getDhByDay();
 		
 		LocalDate lastDayOfData = dhs.lastKey();
 		LocalDate dateMin = dhs.firstKey().minusDays(1);
 		LocalDate dateMax = lastDayOfData.plusDays(1);
 	
-		TreeMap<LocalDate, Dh> deltas = dhDAO.getDeltasDhByDay();
+		SortedMap<LocalDate, Dh> deltas = dhDAO.getDeltasDhByDay();
 			
-		TreeMap<LocalDate, Dh> avgDeltas = DhTools.avgOverAWeek(deltas);
+		SortedMap<LocalDate, Dh> avgDeltas = DhTools.avgOverAWeek(deltas);
 
-		TreeMap<String, DhClAge> cumulClasseAges = dhClAgeDAO.getCumulClasseAges(lastDayOfData);
+		SortedMap<String, DhClAge> cumulClasseAges = dhClAgeDAO.getCumulClasseAges(lastDayOfData);
 	
-		TreeMap<LocalDate, Double> proj = DhTools.calculPolynomialProjection(deltas, "dc");
+		SortedMap<LocalDate, Double> proj = DhTools.calculPolynomialProjection(deltas, "dc");
 		
 		//---- Alimentation du modèle
 	
@@ -107,7 +103,7 @@ public class DonneesHospitalieresController {
 	
 		TreeMap<LocalDate, Double> proj = DhTools.calculPolynomialProjection(dhs, "hosp");
 		
-		TreeMap<LocalDate, Dh> nouveaux = DonneesHospitalieres.getNouveauxByDate(servletContextWrapper.getServletContext());
+		TreeMap<LocalDate, Dh> nouveaux = dhDAO.getNouveauxByDate();
 		
 		TreeMap<LocalDate, Dh> avgNouveaux = DhTools.avgOverAWeek(nouveaux);
 
@@ -153,7 +149,7 @@ public class DonneesHospitalieresController {
 	
 		TreeMap<LocalDate, Double> proj = DhTools.calculPolynomialProjection(dhs, "rea");
 		
-		TreeMap<LocalDate, Dh> nouveaux = DonneesHospitalieres.getNouveauxByDate(servletContextWrapper.getServletContext());
+		TreeMap<LocalDate, Dh> nouveaux = dhDAO.getNouveauxByDate();
 		
 		TreeMap<LocalDate, Dh> avgNouveaux = DhTools.avgOverAWeek(nouveaux);
 
@@ -184,8 +180,8 @@ public class DonneesHospitalieresController {
 		Map<String, Object> model = new HashMap<>();
 
 		TreeMap<LocalDate, Dh> dh = dhDAO.getDhByDay();
-		LocalDate lastKey = dh.lastKey();
-		TreeMap<LocalDate, Dh[]> cumulParDatesEtClasseAges = DonneesHospitalieres.getCumulParDatesEtClasseAges(servletContextWrapper.getServletContext());
+		TreeMap<LocalDate, Dh[]> cumulParDatesEtClasseAges
+		        = dhDAO.getCumulParDatesEtClasseAges();
 		
 		//---- Alimentation du modèle
 		
@@ -279,16 +275,16 @@ public class DonneesHospitalieresController {
 		
 		// Population servant au calcul de l'incidence.
 		// C'est la population Française par défaut.
-		long population = 67000000l;
+		long population = 67_000_000l;
 		
 		TreeMap<LocalDate, TestVir> byWeeks = testVirDAO.cumulTestVirByWeeks(null, true);
 		TreeMap<LocalDate, Integer> incidences
 				= TestVirTools.calculEvolIncidence(byWeeks, population);
 		
 		JsonArrayBuilder incidencesJson = factory.createArrayBuilder();
-		incidences.tailMap(dateMin).forEach((jour, incidence) -> {
-			incidencesJson.add(factory.createArrayBuilder().add(jour.toString()).add(incidence));
-		});
+		incidences.tailMap(dateMin).forEach((jour, incidence) -> 
+			incidencesJson.add(factory.createArrayBuilder().add(jour.toString()).add(incidence))
+		);
 		
 		//---- Generate the model
 	
@@ -307,9 +303,9 @@ public class DonneesHospitalieresController {
 		JsonObject jsonModel = root.build();
 
 		StringWriter out = new StringWriter();
-		JsonWriter jsonWriter = Json.createWriter(out);
-		jsonWriter.writeObject(jsonModel);
-		
+		try (JsonWriter jsonWriter = Json.createWriter(out)) {
+			jsonWriter.writeObject(jsonModel);
+		}
 		modelAndView.addObject("model", out.toString());
 		modelAndView.addObject("scores", scores);
 		modelAndView.addObject("decallMsg", decallMsg);

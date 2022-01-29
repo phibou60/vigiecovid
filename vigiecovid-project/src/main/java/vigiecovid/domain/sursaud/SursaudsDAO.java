@@ -3,8 +3,6 @@ package vigiecovid.domain.sursaud;
 import java.time.LocalDate;
 import java.util.TreeMap;
 
-import javax.servlet.ServletContext;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,11 +23,12 @@ public class SursaudsDAO {
 
 	private final Logger LOGGER = Logger.getLogger(SursaudsDAO.class);
 	
-	private ServletContext context;
+	private Datasets datasets;
 	
-	public SursaudsDAO(@Autowired ServletContext context) {
+	public SursaudsDAO(@Autowired Datasets datasets) {
 		super();
-		this.context = context;
+		LOGGER.info("Instanciate with context: "+datasets);
+		this.datasets = datasets;
 	}
 
 	/**
@@ -40,8 +39,6 @@ public class SursaudsDAO {
 	 * @throws Exception
 	 */
 	public TreeMap<LocalDate, Sursaud> cumulSursaudByDay(String dep) throws Exception {
-
-		Datasets datasets = (Datasets) context.getAttribute("datasets");
 		
 		String myDatasetName = "cumulSursaudByDay.dep="+dep;
 		String parentDatasetName = "sursaud-covid19-quotidien-departement";
@@ -110,8 +107,6 @@ public class SursaudsDAO {
 	 * @throws Exception
 	 */
 	public TreeMap<String, Sursaud> cumulSursaudByDep(LocalDate fromDate, LocalDate toDate) throws Exception {
-
-		Datasets datasets = (Datasets) context.getAttribute("datasets");
 		
 		String myDatasetName = "cumulSursaudByDep.fromDate="+fromDate+",toDate="+toDate;
 		String parentDatasetName = "sursaud-covid19-quotidien-departement";

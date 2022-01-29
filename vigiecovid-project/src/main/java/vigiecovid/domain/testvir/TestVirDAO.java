@@ -10,8 +10,6 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.ServletContext;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,13 +27,12 @@ public class TestVirDAO {
 
 	private static final Logger LOGGER = Logger.getLogger(VacsiDAO.class);
 
-	private ServletContext context;
 	private Datasets datasets;
-
-	public TestVirDAO(@Autowired ServletContext context) {
+	
+	public TestVirDAO(@Autowired Datasets datasets) {
 		super();
-		LOGGER.info("Instanciate with context: "+context);
-		this.context = context;
+		LOGGER.info("Instanciate with context: "+datasets);
+		this.datasets = datasets;
 	}
 	
 	/**
@@ -62,8 +59,6 @@ public class TestVirDAO {
 
 		String myDatasetName = "cumulTestVirByDepLastWeek.v0."+lastDay;
 		String parentDatasetName = "sp-pos-quot-dep";
-	
-		Datasets datasets = (Datasets) context.getAttribute("datasets");
 		
 		if (datasets.exists(myDatasetName)) {
 			logger.info("Return cache: "+myDatasetName);
@@ -139,8 +134,6 @@ public class TestVirDAO {
 		
 		String myDatasetName = "cumulTestVirByDay."+dep+"."+metropoleSeule;
 		String parentDatasetName = "sp-pos-quot-dep";
-	
-		Datasets datasets = (Datasets) context.getAttribute("datasets");
 		
 		if (datasets.exists(myDatasetName)) {
 			LOGGER.info("Return cache: "+myDatasetName);
@@ -307,7 +300,7 @@ public class TestVirDAO {
 
 	public TreeMap<LocalDate, TestVir> cumulTestVirByDay() throws Exception {
 		
-		DatasetHelper helper = new DatasetHelper(getDatasets(), "cumulTestVirByDay",
+		DatasetHelper helper = new DatasetHelper(datasets, "cumulTestVirByDay",
 				"sp-pos-quot-fra") {
 			
 			@Override
@@ -326,17 +319,6 @@ public class TestVirDAO {
 			}
 		};
 		return (TreeMap<LocalDate, TestVir>) helper.getData();
-	}
-	
-	public void setDatasets(Datasets datasets) {
-		this.datasets = datasets;
-	}
-
-	private Datasets getDatasets() {
-		if (datasets == null && context != null) { 
-			datasets = (Datasets) context.getAttribute("datasets");
-		}
-		return datasets;
 	}
 	
 }

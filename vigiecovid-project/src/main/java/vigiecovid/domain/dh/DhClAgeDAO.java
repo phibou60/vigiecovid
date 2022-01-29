@@ -7,8 +7,6 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.ServletContext;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,15 +17,14 @@ import chamette.datasets.Datasets;
 @Component
 public class DhClAgeDAO {
 
-	private final Logger LOGGER = Logger.getLogger(DhClAgeDAO.class);
+	private static final Logger LOGGER = Logger.getLogger(DhClAgeDAO.class);
 
-	private ServletContext context;
 	private Datasets datasets;
 	
-	public DhClAgeDAO(@Autowired ServletContext context) {
+	public DhClAgeDAO(@Autowired Datasets datasets) {
 		super();
-		LOGGER.info("Instanciate with context: "+context);
-		this.context = context;
+		LOGGER.info("Instanciate with context: "+datasets);
+		this.datasets = datasets;
 	}
 	
 	/**
@@ -37,7 +34,7 @@ public class DhClAgeDAO {
 	public TreeMap<String, DhClAge> getCumulClasseAges(LocalDate jourSelection)
 			throws Exception {
 		
-		DatasetHelper helper = new DatasetHelper(getDatasets(), "getCumulClasseAges_"+jourSelection,
+		DatasetHelper helper = new DatasetHelper(datasets, "getCumulClasseAges_"+jourSelection,
 				"donnees-hospitalieres-classe-age-covid19") {
 			
 			@Override
@@ -48,7 +45,7 @@ public class DhClAgeDAO {
 				
 				Map<String, DhClAge> map = Stream.of(lines)
 					.skip(1)
-					.flatMap(l -> parser.parseToStream(l))
+					.flatMap(parser::parseToStream)
 					.filter(d -> !d.getClAge().equals("0"))
 					.filter(d -> d.getJour().equals(jourSelection))
 					.collect(Collectors.toMap(
@@ -65,7 +62,7 @@ public class DhClAgeDAO {
 	
 	public Map<String, List<DhClAge>> getCumulParDatesEtClasseAges() throws Exception {
 		
-		DatasetHelper helper = new DatasetHelper(getDatasets(), "getCumulParDatesEtClasseAges",
+		DatasetHelper helper = new DatasetHelper(datasets, "getCumulParDatesEtClasseAges",
 				"donnees-hospitalieres-classe-age-covid19") {
 			
 			@Override
@@ -98,17 +95,6 @@ public class DhClAgeDAO {
 		};
 		return (Map<String, List<DhClAge>>) helper.getData();
 		
-	}
-	
-	public void setDatasets(Datasets datasets) {
-		this.datasets = datasets;
-	}
-
-	private Datasets getDatasets() {
-		if (datasets == null && context != null) { 
-			datasets = (Datasets) context.getAttribute("datasets");
-		}
-		return datasets;
 	}
 	
 }

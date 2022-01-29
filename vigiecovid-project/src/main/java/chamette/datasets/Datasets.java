@@ -88,6 +88,7 @@ public class Datasets {
 	 * Start the download engine
 	 */
 	public Datasets startDownloadEngine() {
+		LOGGER.info("startDownloadEngine");
 		DownloadEngine downloadEngine = new DownloadEngine(this);
 		downloadEngine.checkUpdate();
 		
@@ -108,6 +109,7 @@ public class Datasets {
 	 * Stop the download engine
 	 */
 	public void stopDownloadEngine() {
+		LOGGER.info("stopDownloadEngine");
 		try {
 			if (timer != null) timer.cancel();
 		} catch (Exception e) {

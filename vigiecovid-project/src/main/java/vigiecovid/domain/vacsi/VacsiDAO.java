@@ -6,8 +6,6 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.ServletContext;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,13 +18,12 @@ public class VacsiDAO {
 
 	private final Logger LOGGER = Logger.getLogger(VacsiDAO.class);
 
-	private ServletContext context;
 	private Datasets datasets;
 	
-	public VacsiDAO(@Autowired ServletContext context) {
+	public VacsiDAO(@Autowired Datasets datasets) {
 		super();
-		LOGGER.info("Instanciate with context: "+context);
-		this.context = context;
+		LOGGER.info("Instanciate with context: "+datasets);
+		this.datasets = datasets;
 	}
 	
 	/**
@@ -35,7 +32,7 @@ public class VacsiDAO {
 	public TreeMap<LocalDate, Vacsi> getVacsiFranceByDay() throws Exception {
 		
 		DatasetHelper helper
-				= new DatasetHelper(getDatasets(), "getVacsiFranceByDay", "vacsi-a-fra") {
+				= new DatasetHelper(datasets, "getVacsiFranceByDay", "vacsi-a-fra") {
 			
 			@Override
 			public Object calculateData(Object parentData) throws Exception {
@@ -54,17 +51,6 @@ public class VacsiDAO {
 		};
 		return (TreeMap<LocalDate, Vacsi>) helper.getData();
 		
-	}
-	
-	public void setDatasets(Datasets datasets) {
-		this.datasets = datasets;
-	}
-
-	private Datasets getDatasets() {
-		if (datasets == null && context != null) { 
-			datasets = (Datasets) context.getAttribute("datasets");
-		}
-		return datasets;
 	}
 	
 }

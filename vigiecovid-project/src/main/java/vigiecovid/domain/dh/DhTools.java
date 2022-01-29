@@ -3,6 +3,7 @@ package vigiecovid.domain.dh;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
@@ -54,7 +55,7 @@ public class DhTools {
 	 */
 	
 	public static TreeMap<LocalDate, Double> calculPolynomialProjection(
-			TreeMap<LocalDate, Dh> dhs, String metric) throws Exception {
+			SortedMap<LocalDate, Dh> dhs, String metric) throws Exception {
 		
 		LocalDate lastDayOfData = dhs.lastKey();
 		
@@ -86,7 +87,7 @@ public class DhTools {
 	 * Calcule la moyenne mobile sur 7 jours
 	 */
 
-	public static TreeMap<LocalDate, Dh> avgOverAWeek(TreeMap<LocalDate, Dh> parentData)
+	public static TreeMap<LocalDate, Dh> avgOverAWeek(SortedMap<LocalDate, Dh> parentData)
 			throws Exception {
 		
 		TreeMap<LocalDate, Dh> ret = new TreeMap<>();

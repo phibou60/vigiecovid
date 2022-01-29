@@ -1,5 +1,8 @@
 package vigiecovid.config;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
@@ -11,35 +14,32 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.context.support.GenericWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import vigiecovid.InitWebApp;
-
 /**
  * Ajout de Spring au web.xml par la programmation.
  *
  */
 public class MainWebAppInitializer implements WebApplicationInitializer {
 	
-	static private final Logger LOGGER = Logger.getLogger(MainWebAppInitializer.class);
+	private static final Logger LOGGER = Logger.getLogger(MainWebAppInitializer.class);
 	
     @Override
-    public void onStartup(final ServletContext sc) throws ServletException {
-    	System.out.println("***** Spring Initializer *****");
+    public void onStartup(final ServletContext servletContext) throws ServletException {
     	LOGGER.info("Startup");
     	
-        AnnotationConfigWebApplicationContext root = 
-          new AnnotationConfigWebApplicationContext();
+        AnnotationConfigWebApplicationContext springContext
+        		= new AnnotationConfigWebApplicationContext();
         
-        root.scan("vigiecovid");
-        sc.addListener(new ContextLoaderListener(root));
+        springContext.register(AppConfig.class);
+        springContext.scan("vigiecovid");
+        servletContext.addListener(new ContextLoaderListener(springContext));
 
-        ServletRegistration.Dynamic appDispatcher = 
-        		sc.addServlet("mvc", new DispatcherServlet(new GenericWebApplicationContext()));
+        GenericWebApplicationContext webApplicationContext = new GenericWebApplicationContext();
+		ServletRegistration.Dynamic appDispatcher
+				= servletContext.addServlet("mvc", new DispatcherServlet(webApplicationContext));
         appDispatcher.setLoadOnStartup(1);
         appDispatcher.addMapping("/app/*");
-        
-        ServletRegistration.Dynamic appServlet =
-        		sc.addServlet("app", new InitWebApp());
-        appServlet.setLoadOnStartup(1);
+
+        servletContext.setAttribute("version", new Date().getTime());
         
     }
     
