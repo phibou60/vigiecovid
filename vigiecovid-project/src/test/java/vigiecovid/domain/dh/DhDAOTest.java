@@ -22,8 +22,7 @@ public class DhDAOTest {
 		Datasets datasets = new Datasets();
 		datasets.add(new DatasetFromCsvFile(folder, "donnees-hospitalieres-covid19"));
 		
-		DhDAO vacsiDAO =  new DhDAO(null);
-		vacsiDAO.setDatasets(datasets);
+		DhDAO vacsiDAO =  new DhDAO(datasets);
 		
 		TreeMap<LocalDate, Dh> map = vacsiDAO.getDhByDay();
 		

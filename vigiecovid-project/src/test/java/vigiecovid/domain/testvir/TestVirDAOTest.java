@@ -24,8 +24,7 @@ public class TestVirDAOTest {
 		Datasets datasets = new Datasets();
 		datasets.add(new DatasetFromCsvFile(folder, "sp-pos-quot-fra"));
 		
-		TestVirDAO dao =  new TestVirDAO(null);
-		dao.setDatasets(datasets);
+		TestVirDAO dao =  new TestVirDAO(datasets);
 		
 		TreeMap<LocalDate, TestVir> map = dao.cumulTestVirByDay();
 		

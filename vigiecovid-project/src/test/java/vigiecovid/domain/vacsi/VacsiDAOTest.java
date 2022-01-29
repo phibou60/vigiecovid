@@ -22,8 +22,7 @@ public class VacsiDAOTest {
 		Datasets datasets = new Datasets();
 		datasets.add(new DatasetFromCsvFile(folder, "vacsi-a-fra"));
 		
-		VacsiDAO vacsiDAO =  new VacsiDAO(null);
-		vacsiDAO.setDatasets(datasets);
+		VacsiDAO vacsiDAO =  new VacsiDAO(datasets);
 		
 		TreeMap<LocalDate, Vacsi> map = vacsiDAO.getVacsiFranceByDay();
 		

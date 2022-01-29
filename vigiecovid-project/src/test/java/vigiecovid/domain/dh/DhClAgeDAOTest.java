@@ -25,8 +25,7 @@ public class DhClAgeDAOTest {
 		Datasets datasets = new Datasets();
 		datasets.add(new DatasetFromCsvFile(folder, "donnees-hospitalieres-classe-age-covid19"));
 		
-		DhClAgeDAO dhClAgeDAO =  new DhClAgeDAO(null);
-		dhClAgeDAO.setDatasets(datasets);
+		DhClAgeDAO dhClAgeDAO =  new DhClAgeDAO(datasets);
 		
 		TreeMap<String, DhClAge> map = dhClAgeDAO.getCumulClasseAges(LocalDate.of(2021, 12, 7));
 		
@@ -60,8 +59,7 @@ public class DhClAgeDAOTest {
 		Datasets datasets = new Datasets();
 		datasets.add(new DatasetFromCsvFile(folder, "donnees-hospitalieres-classe-age-covid19"));
 		
-		DhClAgeDAO dhClAgeDAO =  new DhClAgeDAO(null);
-		dhClAgeDAO.setDatasets(datasets);
+		DhClAgeDAO dhClAgeDAO =  new DhClAgeDAO(datasets);
 		
 		Map<String, List<DhClAge>> map = dhClAgeDAO.getCumulParDatesEtClasseAges();
 	}
