@@ -53,8 +53,11 @@ public class CalculsTest {
 
 	@Test
 	public void testNbDePeriodes() {
-		double result = Calculs.nbDePeriodes(0.10, 1);
-		assertEquals(730, Math.round(result*100));
+		double result1 = Calculs.nbDePeriodes(0.10, 1);
+		assertEquals(730, Math.round(result1*100));
+		
+		double result2 = Calculs.nbDePeriodes(-0.10, 1);
+		assertTrue(Double.isNaN(result2));
 	}
 	
 }
