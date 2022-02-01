@@ -1,6 +1,7 @@
 package vigiecovid.domain;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DepartementsDAO { 
 
-	private Map<String, HashMap> departements;
+	private Map<String, Departement> departements;
 	
 	public DepartementsDAO() throws Exception {
 		load();
@@ -20,10 +21,10 @@ public class DepartementsDAO {
 		//CODDEP;DEP;NBARR;NBCAN;NBCOM;PMUN;PTOT;
 		// NBARR = Nb d'arrondissements
 		// NBCAN = Nb de cantons
-		// NBCAN = Nb de commune
+		// NBCOM = Nb de commune
 		// PMUN = ???
 		// PTOT = Population totale
-		ArrayList<String> datasets = new ArrayList<String>();
+		ArrayList<String> datasets = new ArrayList<>();
 		datasets.add("01;Ain;4;23;393;643350;659180;");
 		datasets.add("02;Aisne;5;21;800;534490;546527;");
 		datasets.add("03;Allier;3;19;317;337988;347035;");
@@ -126,24 +127,24 @@ public class DepartementsDAO {
 		datasets.add("974;La Réunion;4;25;24;853659;863063;");
 		datasets.add("976;Mayotte;1;13;17;256518;256518;");
 
-		departements = new HashMap<String, HashMap>();
+		departements = new HashMap<>();
 		for (String line: datasets) {
-			HashMap<String, Object> departement = new HashMap<String, Object>();
 			String[] splits = line.split(";");
 			
-			departement.put("DEP",   splits[1]);
-			departement.put("NBARR", new Integer("0"+splits[2]));
-			departement.put("NBCAN", new Integer("0"+splits[3]));
-			departement.put("NBCOM", new Integer("0"+splits[4]));
-			departement.put("PMUN",  new Long("0"+splits[5]));
-			departement.put("PTOT",  new Long("00"+splits[6]));
-			departements.put(splits[0], departement);
+			Departement departement = new Departement(splits[0], splits[1],
+					new Integer("0"+splits[2]) , new Integer("0"+splits[3]),
+					new Integer("0"+splits[4]), new Long("0"+splits[6]));
+			departements.put(departement.getDep(), departement);
 		}
 		
 	}
 
-	public Map<String, HashMap> getDepartements() {
-		return departements;
+	public Departement getById(String id) {
+		return departements.get(id);
+	}
+
+	public Collection<Departement> listAll() {
+		return departements.values();
 	}
 
 }

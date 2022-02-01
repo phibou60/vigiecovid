@@ -15,7 +15,7 @@ import chamette.datasets.ParseException;
 
 public class VacsiaParser {
 
-	private final static Logger LOGGER = Logger.getLogger(VacsiaParser.class);
+	private static final Logger LOGGER = Logger.getLogger(VacsiaParser.class);
 	
 	private String sep = null;
 	private long parseExceptionCount = 0;

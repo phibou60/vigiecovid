@@ -6,6 +6,7 @@ import static chamette.tools.CsvTools.unquote;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,12 +21,10 @@ import chamette.datasets.Dataset;
 import chamette.datasets.DatasetHelper;
 import chamette.datasets.Datasets;
 
-import vigiecovid.domain.vacsi.VacsiDAO;
-
 @Component
 public class TestVirDAO {
 
-	private static final Logger LOGGER = Logger.getLogger(VacsiDAO.class);
+	private static final Logger LOGGER = Logger.getLogger(TestVirDAO.class);
 
 	private Datasets datasets;
 	
@@ -60,14 +59,14 @@ public class TestVirDAO {
 		String myDatasetName = "cumulTestVirByDepLastWeek.v0."+lastDay;
 		String parentDatasetName = "sp-pos-quot-dep";
 		
-		if (datasets.exists(myDatasetName)) {
+		if (datasets.containsKey(myDatasetName)) {
 			logger.info("Return cache: "+myDatasetName);
 			return (TreeMap<String, TestVir>) datasets.get(myDatasetName).getData();
 		}
 		
 		TreeMap<String, TestVir> ret = new TreeMap<>();
 		
-		if (!datasets.exists(parentDatasetName)) {
+		if (!datasets.containsKey(parentDatasetName)) {
 			return ret;
 		}
 		
@@ -135,14 +134,14 @@ public class TestVirDAO {
 		String myDatasetName = "cumulTestVirByDay."+dep+"."+metropoleSeule;
 		String parentDatasetName = "sp-pos-quot-dep";
 		
-		if (datasets.exists(myDatasetName)) {
+		if (datasets.containsKey(myDatasetName)) {
 			LOGGER.info("Return cache: "+myDatasetName);
 			return (TreeMap<LocalDate, TestVir>) datasets.get(myDatasetName).getData();
 		}
 		
 		TreeMap<LocalDate, TestVir> ret = new TreeMap<>();
 		
-		if (!datasets.exists(parentDatasetName)) {
+		if (!datasets.containsKey(parentDatasetName)) {
 			return ret;
 		}
 		
@@ -160,7 +159,7 @@ public class TestVirDAO {
 			String[] splits = line.split(sep);
 
 			if (count > 0 && splits.length > 4 && splits[4].equals("0") 
-					&& ((dep == null && (!metropoleSeule || (metropoleSeule && splits[0].length() == 2))) || splits[0].equals(dep))) {
+					&& ((dep == null && ((!metropoleSeule) || (metropoleSeule && splits[0].length() == 2))) || splits[0].equals(dep))) {
 				
 				LocalDate jour = LocalDate.parse(normalizeDate(unquote(splits[1])));
 				
@@ -196,7 +195,7 @@ public class TestVirDAO {
 	 * 
 	 * @param byDays Tests virologiques par jour
 	 */
-	public TreeMap<LocalDate, TestVir> cumulTestVirByWeeks(TreeMap<LocalDate, TestVir> byDays)
+	public TreeMap<LocalDate, TestVir> cumulTestVirByWeeks(SortedMap<LocalDate, TestVir> byDays)
 			throws Exception {
 		
 		TreeMap<LocalDate, TestVir> ret = new TreeMap<>();
@@ -312,8 +311,8 @@ public class TestVirDAO {
 				Map<LocalDate, TestVir> map = Stream.of(lines)
 					.skip(1)
 					.filter(l -> l.indexOf(";0;") > 20)
-					.flatMap(l -> parser.parseToStream(l))
-					.collect(Collectors.toMap(t -> t.getJour(), t -> t));
+					.flatMap(parser::parseToStream)
+					.collect(Collectors.toMap(TestVirQuotFra::getJour, t -> t));
 				
 				return new TreeMap<LocalDate, TestVir>(map);
 			}

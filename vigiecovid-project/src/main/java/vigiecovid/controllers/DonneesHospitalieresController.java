@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.json.Json;
@@ -51,19 +50,19 @@ public class DonneesHospitalieresController {
     public ModelAndView dc() throws Exception {
 		ModelAndView modelAndView = new ModelAndView("dh-dc");
 
-		SortedMap<LocalDate, Dh> dhs = dhDAO.getDhByDay();
+		TreeMap<LocalDate, Dh> dhs = dhDAO.getDhByDay();
 		
 		LocalDate lastDayOfData = dhs.lastKey();
 		LocalDate dateMin = dhs.firstKey().minusDays(1);
 		LocalDate dateMax = lastDayOfData.plusDays(1);
 	
-		SortedMap<LocalDate, Dh> deltas = dhDAO.getDeltasDhByDay();
+		TreeMap<LocalDate, Dh> deltas = dhDAO.getDeltasDhByDay();
 			
-		SortedMap<LocalDate, Dh> avgDeltas = DhTools.avgOverAWeek(deltas);
+		TreeMap<LocalDate, Dh> avgDeltas = DhTools.avgOverAWeek(deltas);
 
-		SortedMap<String, DhClAge> cumulClasseAges = dhClAgeDAO.getCumulClasseAges(lastDayOfData);
+		TreeMap<String, DhClAge> cumulClasseAges = dhClAgeDAO.getCumulClasseAges(lastDayOfData);
 	
-		SortedMap<LocalDate, Double> proj = DhTools.calculPolynomialProjection(deltas, "dc");
+		TreeMap<LocalDate, Double> proj = DhTools.calculPolynomialProjection(deltas, "dc");
 		
 		//---- Alimentation du modèle
 	
@@ -110,8 +109,8 @@ public class DonneesHospitalieresController {
 		//---- Alimentation du modèle
 
 		modelAndView.addObject("lastDayOfData", lastDayOfData);
-		modelAndView.addObject("dernierHosp", dhs.lastEntry().getValue().getHosp());
-		modelAndView.addObject("dc", deltas.lastEntry().getValue().getDc());
+		modelAndView.addObject("dernierHosp", dhs.get(dhs.lastKey()).getHosp());
+		modelAndView.addObject("dc", deltas.get(deltas.lastKey()).getDc());
 
 		modelAndView.addObject("dateMin", dateMin);
 		modelAndView.addObject("dateMax", dateMax);
@@ -133,7 +132,6 @@ public class DonneesHospitalieresController {
 	@GetMapping("/dh-rea")
     public ModelAndView rea() throws Exception {
 		ModelAndView modelAndView = new ModelAndView("dh-rea");
-		Map<String, Object> model = new HashMap<>();
 
 		TreeMap<LocalDate, Dh> dhs = dhDAO.getDhByDay();
 		
@@ -156,7 +154,7 @@ public class DonneesHospitalieresController {
 		//---- Alimentation du modèle
 
 		modelAndView.addObject("lastDayOfData", lastDayOfData);
-		modelAndView.addObject("dernierRea", dhs.lastEntry().getValue().getRea());
+		modelAndView.addObject("dernierRea", dhs.get(dhs.lastKey()).getRea());
 
 		modelAndView.addObject("dateMin", dateMin);
 		modelAndView.addObject("dateMax", dateMax);
@@ -208,13 +206,13 @@ public class DonneesHospitalieresController {
 		/*
 		 * Ce code teste l'idée de générer directement du code js par le code java avec l'API JSON.
 		 */
-		JsonBuilderFactory factory = Json.createBuilderFactory(new HashMap<String, Object>());
+		JsonBuilderFactory factory = Json.createBuilderFactory(new HashMap<>());
 		JsonArrayBuilder line1Json = factory.createArrayBuilder();
 		JsonArrayBuilder line2Json = factory.createArrayBuilder();
 		
-		for (LocalDate jour : dhs.keySet()) {
-			line1Json.add(factory.createArrayBuilder().add(jour.toString()).add(dhs.get(jour).getHosp()));
-			line2Json.add(factory.createArrayBuilder().add(jour.toString()).add(dhs.get(jour).getRea()));
+		for (Map.Entry<LocalDate, Dh> e : dhs.entrySet()) {
+			line1Json.add(factory.createArrayBuilder().add(""+e.getKey()).add(e.getValue().getHosp()));
+			line2Json.add(factory.createArrayBuilder().add(""+e.getKey()).add(e.getValue().getRea()));
 		}
 
 		//---- Essais de plusieurs correlations avec un decallage de jours
@@ -247,7 +245,7 @@ public class DonneesHospitalieresController {
 		
 		//---- Chose the best correlation
 		
-		double bestCorrel = -99999D;
+		double bestCorrel = -99_999D;
 		int bestDecall = 0;
 		
 		for (Map.Entry<Integer, Double> e : scores.entrySet()) {
@@ -275,10 +273,10 @@ public class DonneesHospitalieresController {
 		
 		// Population servant au calcul de l'incidence.
 		// C'est la population Française par défaut.
-		long population = 67_000_000l;
+		long population = 67_000_000L;
 		
 		TreeMap<LocalDate, TestVir> byWeeks = testVirDAO.cumulTestVirByWeeks(null, true);
-		TreeMap<LocalDate, Integer> incidences
+		TreeMap<LocalDate, Long> incidences
 				= TestVirTools.calculEvolIncidence(byWeeks, population);
 		
 		JsonArrayBuilder incidencesJson = factory.createArrayBuilder();
@@ -324,7 +322,7 @@ public class DonneesHospitalieresController {
 		modelAndView.addObject("dateMin", reproductionTestVirByWeeks.firstKey());
 		modelAndView.addObject("dateMax", reproductionTestVirByWeeks.lastKey());
 		
-		double tvDernierRatio = reproductionTestVirByWeeks.lastEntry().getValue();
+		double tvDernierRatio = reproductionTestVirByWeeks.get(reproductionTestVirByWeeks.lastKey());
 		double txParJour = Calculs.tauxParPeriodes(tvDernierRatio - 1, 7);
 		double tvDoubleDesCas = Calculs.nbDePeriodes(txParJour, 1);
 		

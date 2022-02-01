@@ -15,7 +15,7 @@ import chamette.datasets.ParseException;
 
 public class DhClAgeParser {
 
-	private final static Logger LOGGER = Logger.getLogger(DhClAgeParser.class);
+	private static final Logger LOGGER = Logger.getLogger(DhClAgeParser.class);
 	
 	private String sep = null;
 	private long parseExceptionCount = 0;

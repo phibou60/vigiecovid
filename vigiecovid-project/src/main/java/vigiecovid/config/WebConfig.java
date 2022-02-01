@@ -18,7 +18,7 @@ import org.springframework.web.servlet.view.JstlView;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-	static private final Logger LOGGER = Logger.getLogger(WebConfig.class);
+	private static final Logger LOGGER = Logger.getLogger(WebConfig.class);
 
 	/**
 	 * Déclaration du mapping applicable à la view.

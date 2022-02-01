@@ -4,13 +4,13 @@ import java.time.LocalDate;
 
 public class DhClAge {
 
-	public String reg;
-	public String clAge;
-	public LocalDate jour;
-	public long hosp = 0;
-	public long rea = 0;
-	public long rad = 0;
-	public long dc = 0;
+	private String reg;
+	private String clAge;
+	private LocalDate jour;
+	private long hosp = 0;
+	private long rea = 0;
+	private long rad = 0;
+	private long dc = 0;
 
 	public DhClAge() {
 	}

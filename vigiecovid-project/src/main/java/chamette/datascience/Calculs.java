@@ -2,6 +2,10 @@ package chamette.datascience;
 
 public class Calculs {
 
+	private Calculs() {
+		// Can't be instantiated
+	}
+	
 	/**
 	 * Calcul taux de variation d'une valeur à une autre
 	 */
@@ -41,7 +45,7 @@ public class Calculs {
 	 */
 	
 	public static double evolutionSurPlusieursPeriodes(double from, double taux, long periodes) {
-		return from * Math.pow(1D + taux, (double) periodes);
+		return from * Math.pow(1D + taux, periodes);
 	}
 
 	/**

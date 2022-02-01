@@ -14,7 +14,7 @@ import chamette.datasets.ParseException;
 
 public class SursaudParser {
 
-	private final static Logger LOGGER = Logger.getLogger(SursaudParser.class);
+	private static final Logger LOGGER = Logger.getLogger(SursaudParser.class);
 	private String sep = null;
 	
 	public Sursaud parse(String line) throws ParseException, EmptyLineException {

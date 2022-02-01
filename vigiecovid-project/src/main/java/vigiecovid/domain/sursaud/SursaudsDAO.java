@@ -21,7 +21,7 @@ import chamette.datasets.ParseException;
 @Component
 public class SursaudsDAO {
 
-	private final Logger LOGGER = Logger.getLogger(SursaudsDAO.class);
+	private static final Logger LOGGER = Logger.getLogger(SursaudsDAO.class);
 	
 	private Datasets datasets;
 	
@@ -43,14 +43,14 @@ public class SursaudsDAO {
 		String myDatasetName = "cumulSursaudByDay.dep="+dep;
 		String parentDatasetName = "sursaud-covid19-quotidien-departement";
 		
-		if (datasets.exists(myDatasetName)) {
+		if (datasets.containsKey(myDatasetName)) {
 			LOGGER.info("Return cache: "+myDatasetName);
 			return (TreeMap<LocalDate, Sursaud>) datasets.get(myDatasetName).getData();
 		}
 		
 		TreeMap<LocalDate, Sursaud> ret = new TreeMap<>();
 		
-		if (!datasets.exists(parentDatasetName)) {
+		if (!datasets.containsKey(parentDatasetName)) {
 			return ret;
 		}
 		
@@ -66,7 +66,7 @@ public class SursaudsDAO {
 			try {
 				Sursaud sursaud = parser.parse(line);
 
-				if (dep != null && !sursaud.getDep().equals(parser)) {
+				if (dep != null && !sursaud.getDep().equals(dep)) {
 					continue;
 				}
 	
@@ -111,14 +111,14 @@ public class SursaudsDAO {
 		String myDatasetName = "cumulSursaudByDep.fromDate="+fromDate+",toDate="+toDate;
 		String parentDatasetName = "sursaud-covid19-quotidien-departement";
 		
-		if (datasets.exists(myDatasetName)) {
+		if (datasets.containsKey(myDatasetName)) {
 			LOGGER.info("Return cache: "+myDatasetName);
 			return (TreeMap<String, Sursaud>) datasets.get(myDatasetName).getData();
 		}
 		
 		TreeMap<String, Sursaud> ret = new TreeMap<>();
 		
-		if (!datasets.exists(parentDatasetName)) {
+		if (!datasets.containsKey(parentDatasetName)) {
 			return ret;
 		}
 		

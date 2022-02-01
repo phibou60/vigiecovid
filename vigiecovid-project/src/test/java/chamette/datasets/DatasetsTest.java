@@ -33,7 +33,7 @@ public class DatasetsTest {
 		
 		assertEquals("d1", datasets.get("d1").getName());
 		assertEquals("d2", datasets.get("d2").getName());
-		assertEquals(7, datasets.getAllDatasets().size());
+		assertEquals(7, datasets.size());
 		assertEquals("d12", datasets.get("d12").getName());
 		assertEquals("d112", datasets.get("d112").getName());
 		
@@ -50,17 +50,17 @@ public class DatasetsTest {
 		assertEquals("d111", d11b.getChildren().get(0).getName());
 		assertEquals("x111", d11b.getChildren().get(0).getData());
 		
-		assertTrue(datasets.exists("d1"));
-		assertFalse(datasets.exists("unk"));
+		assertTrue(datasets.containsKey("d1"));
+		assertFalse(datasets.containsKey("unk"));
 		
 		datasets.remove(d3);
-		assertEquals(6, datasets.getAllDatasets().size());
+		assertEquals(6, datasets.size());
 		
 		datasets.remove(d1);
-		assertEquals(1, datasets.getAllDatasets().size());
-		assertFalse(datasets.exists("d1"));
-		assertFalse(datasets.exists("d11"));
-		assertFalse(datasets.exists("d111"));
+		assertEquals(1, datasets.size());
+		assertFalse(datasets.containsKey("d1"));
+		assertFalse(datasets.containsKey("d11"));
+		assertFalse(datasets.containsKey("d111"));
 		
 	}
 

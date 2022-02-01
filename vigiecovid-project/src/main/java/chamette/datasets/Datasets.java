@@ -12,48 +12,20 @@ import org.apache.log4j.Logger;
  * if Datasets are updated.
  *
  */
-public class Datasets {
+public class Datasets extends ConcurrentHashMap<String, Dataset> {
 
 	private static final Logger LOGGER = Logger.getLogger(Datasets.class);
-	
-	 // We use ConcurrentHashMap because of concurrent access
-	private Map<String, Dataset> datasets = new ConcurrentHashMap<>();
 	private Timer timer;
-	
-	/**
-	 * Check if this Dataset exists in the collection
-	 * @param key
-	 * @return true or false
-	 */
-	public boolean exists(String key) {
-		return datasets.containsKey(key);
-	}
-	
-	/**
-	 * Get a Dataset by its name.
-	 * @param key
-	 * @return
-	 */
-	public Dataset get(String key) {
-		return datasets.get(key);
-	}
-	
-	/**
-	 * Get all Datasets.
-	 * @return
-	 */
-	public Map<String, Dataset> getAllDatasets() {
-		return datasets;
-	}
 	
 	/**
 	 * Add a Dataset to the collection
 	 * @param dataset
 	 * @return
 	 */
-	public Dataset add(Dataset dataset) {
+	public Datasets add(Dataset dataset) {
 		LOGGER.info("Add Dataset: "+dataset.getName());
-		return datasets.put(dataset.getName(), dataset);
+		put(dataset.getName(), dataset);
+		return this;
 	}
 	
 	/**
@@ -62,7 +34,7 @@ public class Datasets {
 	 * @return
 	 */
 	public Datasets remove(Dataset dataset) {
-		Dataset removed = datasets.remove(dataset.getName());
+		Dataset removed = remove(dataset.getName());
 		LOGGER.info("Remove Dataset: "+dataset.getName()+" => "+(removed==null?"Unknown !!":"done"));
 		removeChildrenDatasets(dataset);
 		return this;

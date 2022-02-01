@@ -1,6 +1,5 @@
 package vigiecovid.config;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.servlet.ServletContext;

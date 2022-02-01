@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import vigiecovid.domain.Departement;
 import vigiecovid.domain.DepartementsDAO;
 import vigiecovid.domain.testvir.TestVir;
 import vigiecovid.domain.testvir.TestVirDAO;
@@ -20,7 +21,7 @@ import vigiecovid.domain.testvir.TestVirTools;
 @Controller
 public class TestvirController {
 
-	Logger LOGGER = Logger.getLogger(TestvirController.class);
+	private static final Logger LOGGER = Logger.getLogger(TestvirController.class);
 
 	@Autowired
 	private TestVirDAO testVirDAO;	
@@ -48,23 +49,21 @@ public class TestvirController {
 	
 		// Population servant au calcul de l'incidence.
 		// C'est la population Française par défaut.
-		long population = 67000000l;
+		long population = 67_000_000L;
 	
 		// Si le département a été reçu en paramètre, la population est alors celle qui 
 		// est prise en compte.
 		if (dep != null) {
-			HashMap<String, HashMap> departements
-					= (HashMap<String, HashMap>) departementsDAO.getDepartements();
-			if (departements.get(dep) != null) {
-				HashMap<String, Object> departement = (HashMap<String, Object>) departements.get(dep);
-				population = (long) departement.get("PTOT");
+			Departement departement = departementsDAO.getById(dep);
+			if (departement != null) {
+				population = departement.getPopulationTotale();
 			}
 		}
 	
 		// Calcul de l'évolution de l'incidence
 		
 		TreeMap<LocalDate, TestVir> byWeeks = testVirDAO.cumulTestVirByWeeks(byDays);
-		TreeMap<LocalDate, Integer> incidences
+		TreeMap<LocalDate, Long> incidences
 				= TestVirTools.calculEvolIncidence(byWeeks, population);
 		
 		TreeMap<LocalDate, Double> proj
@@ -108,13 +107,9 @@ public class TestvirController {
 		
 		TestVir testVir = cumulByDay.get(day);
 		model.put("testVir", testVir);
-		//model.put("incid", Math.round(((double)testVir.getPositifs() * 100) / testVir.getTests()));
 		
 		TreeMap<String, TestVir> cumulTestVirByDepLastWeek
 				= testVirDAO.cumulTestVirByDepLastWeek(day);
-		
-		HashMap<String, HashMap> departements
-				= (HashMap<String, HashMap>) departementsDAO.getDepartements();
 		
 		TreeMap<String, Map> depStats = new TreeMap<>(); 
 		
@@ -125,10 +120,11 @@ public class TestvirController {
 			dep.put("positifs",	entry.getValue().getPositifs());
 			dep.put("pc", entry.getValue().getPc());
 			
-			if (departements.containsKey(entry.getKey())) {
-				Map<String, Object> departement = departements.get(entry.getKey());
-				dep.put("lib", departement.get("DEP"));
-				long population = (Long) departement.get("PTOT");
+			Departement departement = departementsDAO.getById(entry.getKey());
+			
+			if (departement != null) {
+				dep.put("lib", departement.getLib());
+				long population = departement.getPopulationTotale();
 				double incid = (double) entry.getValue().getPositifs() * 100_000 / population;
 				dep.put("incid", Math.round(incid));
 				depStats.put(entry.getKey(), dep);
@@ -137,11 +133,11 @@ public class TestvirController {
 		model.put("depStats", depStats);
 		
 		//---- Recherche jours précédent et suivant le jour en cours 
-		LocalDate jourSuivant = cumulByDay.higherKey(day);
+		LocalDate jourSuivant = day.plusDays(1);
 		if (jourSuivant != null) {
 			model.put("jourSuivant", jourSuivant);
 		}
-		LocalDate jourPrec = cumulByDay.lowerKey(day);
+		LocalDate jourPrec = day.minusDays(1);
 		if (jourPrec != null) {
 			model.put("jourPrec", jourPrec);
 		}

@@ -16,7 +16,7 @@ import chamette.datasets.Datasets;
 @Component
 public class VacsiDAO {
 
-	private final Logger LOGGER = Logger.getLogger(VacsiDAO.class);
+	private static final Logger LOGGER = Logger.getLogger(VacsiDAO.class);
 
 	private Datasets datasets;
 	
@@ -43,7 +43,7 @@ public class VacsiDAO {
 				Map<LocalDate, Vacsi> map = Stream.of(lines)
 					.skip(1)
 					.filter(l -> l.startsWith("FR;0;"))
-					.flatMap(l -> parser.parseToStream(l))
+					.flatMap(parser::parseToStream)
 					.collect(Collectors.toMap(Vacsi::getJour, vacsi -> vacsi));
 				
 				return new TreeMap<LocalDate, Vacsi>(map);

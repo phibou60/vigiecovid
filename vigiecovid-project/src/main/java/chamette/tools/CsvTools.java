@@ -1,20 +1,34 @@
 package chamette.tools;
 
 public class CsvTools {
+
+	/**
+	 * CSV helpers tools.
+	 */
+	
+	private CsvTools() {
+		// Can't be instantiated
+	}
 	
 	public static String getSeparator(String line) {
-		String line_ = line.trim();
-		String[] splits1 = line_.split(";");
-		String[] splits2 = line_.split(",");
-		String[] splits3 = line_.split("\t");
-		if (splits1.length > splits2.length && splits1.length > splits3.length) return ";";
-		if (splits2.length > splits1.length && splits2.length > splits3.length) return ",";
+		line = line.trim();
+		String[] splits1 = line.split(";");
+		String[] splits2 = line.split(",");
+		String[] splits3 = line.split("\t");
+		if (splits1.length > splits2.length && splits1.length > splits3.length) {
+			return ";";
+		}
+		if (splits2.length > splits1.length && splits2.length > splits3.length) {
+			return ",";
+		}
 		return "\t";
 	}
 
 	public static String unquote(String s) {
 		s = s.trim();
-		if (s.startsWith("\"") && s.endsWith("\"")) return s.substring(1, s.length()-1);
+		if (s.startsWith("\"") && s.endsWith("\"")) {
+			return s.substring(1, s.length()-1);
+		}
 		return s;
 	}
 

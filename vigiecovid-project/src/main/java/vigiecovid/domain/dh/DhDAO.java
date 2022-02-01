@@ -104,14 +104,14 @@ public class DhDAO {
 		String myDatasetName = "dh-nouveaux";
 		String parentDatasetName = "donnees-hospitalieres-nouveaux-covid19";
 		
-		if (datasets.exists(myDatasetName)) {
+		if (datasets.containsKey(myDatasetName)) {
 			logger.info("Return cache: "+myDatasetName);
 			return (TreeMap<LocalDate, Dh>) datasets.get(myDatasetName).getData();
 		}
 		
 		TreeMap<LocalDate, Dh> ret = new TreeMap<>();
 		
-		if (!datasets.exists(parentDatasetName)) {
+		if (!datasets.containsKey(parentDatasetName)) {
 			return ret;
 		}
 		
@@ -162,14 +162,14 @@ public class DhDAO {
 		String parentDatasetName = "donnees-hospitalieres-classe-age-covid19";
 		String myDatasetName = "dh-jout_et_classe_age_dernier_jour";
 		
-		if (datasets.exists(myDatasetName)) {
+		if (datasets.containsKey(myDatasetName)) {
 			logger.info("Return cache: "+myDatasetName);
 			return (TreeMap<LocalDate, Dh[]>) datasets.get(myDatasetName).getData();
 		}
 		
 		TreeMap<LocalDate, Dh[]> ret = new TreeMap<>();
 		
-		if (!datasets.exists(parentDatasetName)) {
+		if (!datasets.containsKey(parentDatasetName)) {
 			return ret;
 		}
 

@@ -23,6 +23,17 @@ public class Dh {
 		this.dc = dc;
 		count = 1;
 	}
+	
+	public Dh(Dh clone) {
+		this.dep = clone.getDep();
+		this.sexe = clone.getSexe();
+		this.jour = clone.getJour();
+		this.hosp = clone.getHosp();
+		this.rea = clone.getRea();
+		this.rad = clone.getRad();
+		this.dc = clone.getDc();
+		count = 1;
+	}
 
 	public String getDep() {
 		return dep;
@@ -81,10 +92,6 @@ public class Dh {
 		dc = dc / count;
 		count = 1;
 		return this;
-	}
-
-	public Dh clone() {
-		return new Dh(dep, sexe, jour, hosp, rea, rad, dc);
 	}
 
 	@Override

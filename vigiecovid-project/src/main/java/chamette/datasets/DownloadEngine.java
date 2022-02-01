@@ -4,6 +4,10 @@ import java.util.Date;
 import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
+/**
+ * Class that check if Datasets are updated a,nd must be downloaded again.
+ *
+ */
 public class DownloadEngine extends TimerTask { 
 	private static final Logger LOGGER = Logger.getLogger(DownloadEngine.class);
 	private Datasets datasets;
@@ -18,7 +22,7 @@ public class DownloadEngine extends TimerTask {
 	public void checkUpdate() {
 		LOGGER.info("**** Check Update ****");
 		lastCheck = new Date();
-		for (Dataset dataset : datasets.getAllDatasets().values()) {
+		for (Dataset dataset : datasets.values()) {
 			if (dataset instanceof Downloadable) {
 				try {
 					if (setCancel) return;

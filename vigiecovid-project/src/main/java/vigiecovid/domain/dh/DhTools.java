@@ -3,6 +3,7 @@ package vigiecovid.domain.dh;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -15,6 +16,10 @@ import org.apache.log4j.Logger;
 public class DhTools {
 	
 	private static final Logger LOGGER = Logger.getLogger(DhTools.class); 
+
+	private DhTools() {
+		// Can't be instantiated
+	}
 	
 	/**
 	 * Calcul projection de l'évolution de l'incidence sous la forme d'un modèle linéaire
@@ -24,7 +29,7 @@ public class DhTools {
 	 */
 	
 	public static TreeMap<LocalDate, Double> calculLinearProjection(
-			TreeMap<LocalDate, Dh> dhs, String metric) throws Exception {
+			SortedMap<LocalDate, Dh> dhs, String metric) throws Exception {
 		
 		LocalDate lastDayOfData = dhs.lastKey();
 		
@@ -36,12 +41,12 @@ public class DhTools {
 		dhs
 			.tailMap(dateMinProj)
 			.forEach((jour, value) -> 
-				simpleRegression.addData((double) jour.toEpochDay(), value.get(metric))
+				simpleRegression.addData(jour.toEpochDay(), value.get(metric))
 			);
 	
 		TreeMap<LocalDate, Double> proj = new TreeMap<>();
 		for (LocalDate jour = dateMinProj; jour.compareTo(dateMaxProj) <= 0; jour = jour.plusDays(1)) {
-			proj.put(jour, simpleRegression.predict((double) jour.toEpochDay()));
+			proj.put(jour, simpleRegression.predict(jour.toEpochDay()));
 		}
 		
 		return proj;
@@ -68,7 +73,7 @@ public class DhTools {
 		dhs
 			.tailMap(dateMinProj)
 			.forEach((jour, value) -> 
-				points.add(new WeightedObservedPoint(1d, (double) jour.toEpochDay(), value.get(metric)))
+				points.add(new WeightedObservedPoint(1d, jour.toEpochDay(), value.get(metric)))
 			);
 
 		double[] coeffs = polynomialCurveFitter.fit(points);
@@ -94,7 +99,7 @@ public class DhTools {
 		
 		parentData.entrySet().stream().skip(6).forEach(e -> {
 			LOGGER.debug("e: "+e);
-			Dh sum = e.getValue().clone();
+			Dh sum = new Dh(e.getValue());
 
 			for (int i = -6; i < 0; i++) {
 				LocalDate k = e.getKey().plusDays(i);

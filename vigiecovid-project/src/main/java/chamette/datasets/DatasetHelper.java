@@ -1,18 +1,18 @@
 package chamette.datasets;
 
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import org.apache.log4j.Logger;
 
 public abstract class DatasetHelper {
 
-	private final Logger LOGGER = Logger.getLogger(DatasetHelper.class);
+	private static final Logger LOGGER = Logger.getLogger(DatasetHelper.class);
 	
 	private Datasets datasets;
 	private String myDatasetName;
 	private String parentDatasetName;
 	
-	public DatasetHelper(Datasets datasets, String myDatasetName, String parentDatasetName) {
+	protected DatasetHelper(Datasets datasets, String myDatasetName, String parentDatasetName) {
 		
 		this.datasets = datasets;
 		this.myDatasetName = myDatasetName;
@@ -21,12 +21,12 @@ public abstract class DatasetHelper {
 	
 	public Object getData() throws Exception {
 				
-		if (datasets.exists(myDatasetName)) {
+		if (datasets.containsKey(myDatasetName)) {
 			LOGGER.info("Return cache: "+myDatasetName);
 			return datasets.get(myDatasetName).getData();
 		}
 		
-		if (!datasets.exists(parentDatasetName)) {
+		if (!datasets.containsKey(parentDatasetName)) {
 			return null;
 		}
 		
@@ -37,8 +37,8 @@ public abstract class DatasetHelper {
 		Object data = calculateData(datasets.get(parentDatasetName).getData());
 	
 		long end = System.nanoTime();
-		long duration = Math.round((end-start)/1_000_000);
-		LOGGER.info("> Done in "+DecimalFormat.getInstance().format(duration)+" ms");
+		long duration = Math.round((end - start) / 1_000_000F);
+		LOGGER.info("> Done in "+NumberFormat.getInstance().format(duration)+" ms");
 		
 		if (data == null) {
 			throw new Exception("No data");

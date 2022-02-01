@@ -1,7 +1,7 @@
 package chamette.datasets;
 
 /**
- * This is a class that represent a downloaded DataSet (not calculated from another).
+ * This class represents a downloaded DataSet (not calculated from another).
  *
  */
 public interface Downloadable extends Dataset {

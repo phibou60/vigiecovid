@@ -48,20 +48,20 @@ public class SursauController {
 			Map<String, Object> element = new HashMap<>();
 			Sursaud sursaud = entry.getValue();
 			
-			double pc_pass_corona = 0.0d;
-			double pc_hospit_corona = 0.0d;
+			double pcPassgeCorona = 0.0d;
+			double pcHospitCorona = 0.0d;
 			if (sursaud.getNbrePassTot() > 0) {
-				pc_pass_corona = 100.0d * sursaud.getNbrePassCorona() / sursaud.getNbrePassTot();
-				pc_hospit_corona = 100.0d * sursaud.getNbreHospitCorona() / sursaud.getNbrePassTot();
+				pcPassgeCorona = 100.0d * sursaud.getNbrePassCorona() / sursaud.getNbrePassTot();
+				pcHospitCorona = 100.0d * sursaud.getNbreHospitCorona() / sursaud.getNbrePassTot();
 			}
-			element.put("pc_pass_corona", pc_pass_corona);
-			element.put("pc_hospit_corona", pc_hospit_corona);
+			element.put("pc_pass_corona", pcPassgeCorona);
+			element.put("pc_hospit_corona", pcHospitCorona);
 			
-			double pc_acte_corona = 0.0d;
+			double pcActeCorona = 0.0d;
 			if (sursaud.getNbreActeTot() > 0) {
-				pc_acte_corona = 100.0d * sursaud.getNbreActeCorona() / sursaud.getNbreActeTot();
+				pcActeCorona = 100.0d * sursaud.getNbreActeCorona() / sursaud.getNbreActeTot();
 			}
-			element.put("pc_acte_corona", pc_acte_corona);
+			element.put("pc_acte_corona", pcActeCorona);
 			
 			cumulByDates.put(entry.getKey().toString(), element);
 		}
@@ -83,7 +83,7 @@ public class SursauController {
 		
 		ModelAndView modelAndView = new ModelAndView("sursau-dep");
 		
-		JsonBuilderFactory factory = Json.createBuilderFactory(new HashMap<String, Object>());
+		JsonBuilderFactory factory = Json.createBuilderFactory(new HashMap<>());
 		JsonObjectBuilder root = factory.createObjectBuilder();
 		
 		TreeMap<LocalDate, Sursaud> cumulByDay = sursaudsDAO.cumulSursaudByDay(null);
@@ -107,9 +107,9 @@ public class SursauController {
 		JsonObject jsonModel = root.build();
 
 		StringWriter out = new StringWriter();
-		JsonWriter jsonWriter = Json.createWriter(out);
-		jsonWriter.writeObject(jsonModel);
-		
+		try (JsonWriter jsonWriter = Json.createWriter(out)) {
+			jsonWriter.writeObject(jsonModel);
+		}
 		modelAndView.addObject("model", out.toString());
 
         return modelAndView;

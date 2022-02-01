@@ -15,10 +15,10 @@ import vigiecovid.domain.vacsi.VacsiDAO;
 @Controller
 public class VacsiController {
 
+	private static final Logger LOGGER = Logger.getLogger(VacsiController.class);
+
 	@Autowired
 	private VacsiDAO vacsiDAO;	
-
-	private static final Logger LOGGER = Logger.getLogger(VacsiController.class);
 	
 	@GetMapping("/vacsi")
     public ModelAndView vacsi() throws Exception {

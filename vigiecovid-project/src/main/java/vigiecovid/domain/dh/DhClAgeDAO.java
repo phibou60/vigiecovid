@@ -73,7 +73,7 @@ public class DhClAgeDAO {
 				
 				Map<String, DhClAge> map = Stream.of(lines)
 					.skip(1)
-					.flatMap(l -> parser.parseToStream(l))
+					.flatMap(parser::parseToStream)
 					.filter(d -> !d.getClAge().equals("0"))
 					.collect(Collectors.toMap(
 							d -> d.getClAge()+";"+d.getJour(),

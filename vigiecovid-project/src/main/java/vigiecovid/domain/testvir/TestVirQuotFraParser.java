@@ -14,7 +14,7 @@ import chamette.datasets.ParseException;
 
 public class TestVirQuotFraParser {
 
-	private final static Logger LOGGER = Logger.getLogger(TestVirQuotFraParser.class);
+	private static final Logger LOGGER = Logger.getLogger(TestVirQuotFraParser.class);
 	
 	private String sep = null;
 	private long parseExceptionCount = 0;

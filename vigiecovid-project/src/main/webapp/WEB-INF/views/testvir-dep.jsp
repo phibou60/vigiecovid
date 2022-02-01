@@ -118,7 +118,7 @@
 	<tbody>
 		<c:forEach items="${model.depStats}" var="entry">
 			<tr>
-				<td style='text-align:center;'><a href='testvirday.jsp?dep=${entry.key}&lib=${entry.value.lib}'>${entry.key}</a></td>
+				<td style='text-align:center;'><a href='testvir-day?dep=${entry.key}&lib=${entry.value.lib}'>${entry.key}</a></td>
 				<td style='text-align:left;'>${entry.value.lib}</td>
 				<td style='text-align:right;'><fmt:formatNumber value="${entry.value.tests}" maxFractionDigits="3"/></td>
 				<td style='text-align:right;'><fmt:formatNumber value="${entry.value.positifs}" maxFractionDigits="3"/></td>
