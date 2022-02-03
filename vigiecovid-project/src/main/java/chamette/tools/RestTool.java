@@ -25,12 +25,12 @@ import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 
 public class RestTool {
 	
-	private static final Logger LOGGER = Logger.getLogger(RestTool.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(RestTool.class);
 	
 	private int returnCode;
 	private JsonObject result;

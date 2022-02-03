@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +22,7 @@ import chamette.datasets.Datasets;
 @Component
 public class DhDAO {
 
-	private static final Logger LOGGER = Logger.getLogger(DhDAO.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(DhDAO.class);
 
 	private Datasets datasets;
 	
@@ -99,7 +99,7 @@ public class DhDAO {
 	
 	// TODO : à réécrire
 	public TreeMap<LocalDate, Dh> getNouveauxByDate() throws Exception {
-		Logger logger = Logger.getLogger("getNouveauxByDate");
+		Logger logger = org.apache.logging.log4j.LogManager.getFormatterLogger("getNouveauxByDate");
 	
 		String myDatasetName = "dh-nouveaux";
 		String parentDatasetName = "donnees-hospitalieres-nouveaux-covid19";
@@ -157,7 +157,7 @@ public class DhDAO {
 
 	// TODO : à réécrire
 	public TreeMap<LocalDate, Dh[]> getCumulParDatesEtClasseAges() throws Exception {
-		Logger logger = Logger.getLogger("getCumulParDatesEtClasseAges");
+		Logger logger = org.apache.logging.log4j.LogManager.getFormatterLogger("getCumulParDatesEtClasseAges");
 		
 		String parentDatasetName = "donnees-hospitalieres-classe-age-covid19";
 		String myDatasetName = "dh-jout_et_classe_age_dernier_jour";

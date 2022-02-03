@@ -6,7 +6,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -19,7 +19,7 @@ import org.springframework.web.servlet.DispatcherServlet;
  */
 public class MainWebAppInitializer implements WebApplicationInitializer {
 	
-	private static final Logger LOGGER = Logger.getLogger(MainWebAppInitializer.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(MainWebAppInitializer.class);
 	
     @Override
     public void onStartup(final ServletContext servletContext) throws ServletException {

@@ -11,11 +11,11 @@ import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math3.fitting.PolynomialCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoint;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 public class DhTools {
 	
-	private static final Logger LOGGER = Logger.getLogger(DhTools.class); 
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(DhTools.class); 
 
 	private DhTools() {
 		// Can't be instantiated

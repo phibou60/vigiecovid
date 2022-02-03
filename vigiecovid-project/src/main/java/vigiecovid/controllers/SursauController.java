@@ -12,7 +12,7 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonWriter;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +28,7 @@ public class SursauController {
 	@Autowired
 	private SursaudsDAO sursaudsDAO;	
 	
-	private static final Logger LOGGER = Logger.getLogger(SursauController.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(SursauController.class);
 
 
 	@GetMapping("/sursau-day")

@@ -16,7 +16,7 @@ import javax.json.JsonObjectBuilder;
 import javax.json.JsonWriter;
 
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +35,7 @@ import vigiecovid.domain.testvir.TestVirTools;
 @Controller
 public class DonneesHospitalieresController {
 	
-	private static final Logger LOGGER = Logger.getLogger(DonneesHospitalieresController.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(DonneesHospitalieresController.class);
 
 	@Autowired
 	private DhDAO dhDAO;

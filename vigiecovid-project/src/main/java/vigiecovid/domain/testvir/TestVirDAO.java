@@ -11,7 +11,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +24,7 @@ import chamette.datasets.Datasets;
 @Component
 public class TestVirDAO {
 
-	private static final Logger LOGGER = Logger.getLogger(TestVirDAO.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(TestVirDAO.class);
 
 	private Datasets datasets;
 	
@@ -54,7 +54,7 @@ public class TestVirDAO {
 	 */
 	public TreeMap<String, TestVir> cumulTestVirByDepLastWeek(LocalDate lastDay)
 			throws Exception {
-		Logger logger = Logger.getLogger("cumulTestVirByDepLastWeek");
+		Logger logger = org.apache.logging.log4j.LogManager.getFormatterLogger("cumulTestVirByDepLastWeek");
 
 		String myDatasetName = "cumulTestVirByDepLastWeek.v0."+lastDay;
 		String parentDatasetName = "sp-pos-quot-dep";

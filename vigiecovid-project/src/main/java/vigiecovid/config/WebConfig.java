@@ -1,6 +1,6 @@
 package vigiecovid.config;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.ViewResolver;
@@ -18,7 +18,7 @@ import org.springframework.web.servlet.view.JstlView;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-	private static final Logger LOGGER = Logger.getLogger(WebConfig.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(WebConfig.class);
 
 	/**
 	 * Déclaration du mapping applicable à la view.

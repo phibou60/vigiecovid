@@ -3,7 +3,7 @@ package chamette.datasets;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * A basic implementation of a Dataset that can be instantiated directly.<br>
@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
  */
 public class CommonDataset implements Dataset {
 
-	protected static final Logger LOGGER = Logger.getLogger(CommonDataset.class);
+	protected static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(CommonDataset.class);
 	
 	private String name;
 	protected Object data;

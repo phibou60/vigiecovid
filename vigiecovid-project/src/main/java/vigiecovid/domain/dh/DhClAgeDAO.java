@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ import chamette.datasets.Datasets;
 @Component
 public class DhClAgeDAO {
 
-	private static final Logger LOGGER = Logger.getLogger(DhClAgeDAO.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(DhClAgeDAO.class);
 
 	private Datasets datasets;
 	

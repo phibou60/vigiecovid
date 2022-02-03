@@ -8,14 +8,14 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import chamette.datasets.EmptyLineException;
 import chamette.datasets.ParseException;
 
 public class DhClAgeParser {
 
-	private static final Logger LOGGER = Logger.getLogger(DhClAgeParser.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(DhClAgeParser.class);
 	
 	private String sep = null;
 	private long parseExceptionCount = 0;

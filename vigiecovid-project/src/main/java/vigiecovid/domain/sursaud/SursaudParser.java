@@ -7,14 +7,14 @@ import static chamette.tools.CsvTools.unquote;
 import java.time.LocalDate;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import chamette.datasets.EmptyLineException;
 import chamette.datasets.ParseException;
 
 public class SursaudParser {
 
-	private static final Logger LOGGER = Logger.getLogger(SursaudParser.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(SursaudParser.class);
 	private String sep = null;
 	
 	public Sursaud parse(String line) throws ParseException, EmptyLineException {

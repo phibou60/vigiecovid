@@ -2,11 +2,11 @@ package chamette.datasets;
 
 import java.text.NumberFormat;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 public abstract class DatasetHelper {
 
-	private static final Logger LOGGER = Logger.getLogger(DatasetHelper.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(DatasetHelper.class);
 	
 	private Datasets datasets;
 	private String myDatasetName;

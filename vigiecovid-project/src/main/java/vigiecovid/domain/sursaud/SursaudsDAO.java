@@ -3,7 +3,7 @@ package vigiecovid.domain.sursaud;
 import java.time.LocalDate;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +21,7 @@ import chamette.datasets.ParseException;
 @Component
 public class SursaudsDAO {
 
-	private static final Logger LOGGER = Logger.getLogger(SursaudsDAO.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(SursaudsDAO.class);
 	
 	private Datasets datasets;
 	

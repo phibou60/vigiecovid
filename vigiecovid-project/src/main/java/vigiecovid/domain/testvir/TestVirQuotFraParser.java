@@ -7,14 +7,14 @@ import static chamette.tools.CsvTools.unquote;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import chamette.datasets.EmptyLineException;
 import chamette.datasets.ParseException;
 
 public class TestVirQuotFraParser {
 
-	private static final Logger LOGGER = Logger.getLogger(TestVirQuotFraParser.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(TestVirQuotFraParser.class);
 	
 	private String sep = null;
 	private long parseExceptionCount = 0;

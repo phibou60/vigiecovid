@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * A collection of Dataset.<br>
@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
  */
 public class Datasets extends ConcurrentHashMap<String, Dataset> {
 
-	private static final Logger LOGGER = Logger.getLogger(Datasets.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(Datasets.class);
 	private Timer timer;
 	
 	/**

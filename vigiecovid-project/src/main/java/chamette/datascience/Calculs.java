@@ -1,10 +1,11 @@
 package chamette.datascience;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Calculs {
 
-	private static final Logger LOGGER = Logger.getLogger(Calculs.class);
+	private static final Logger LOGGER = LogManager.getFormatterLogger(Calculs.class);
 	
 	private Calculs() {
 		// Can't be instantiated
@@ -66,7 +67,7 @@ public class Calculs {
 	 */
 	
 	public static double nbDePeriodes(double txInit, double txFinal) {
-		LOGGER.debug("txInit: " + txInit + ", txFinal: " + txFinal);
+		LOGGER.debug("txInit2: %s, txFinal: %s", txInit , txFinal);
 		
 		if (txFinal < txInit || txInit < 0) {
 			return Double.NaN;

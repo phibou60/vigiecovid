@@ -11,11 +11,11 @@ import java.util.List;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 public class DataGouvFrDownloader extends CommonDataset implements Downloadable {
 
-	private static final Logger LOGGER = Logger.getLogger(DataGouvFrDownloader.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(DataGouvFrDownloader.class);
 	
 	private String dgDatasets;
 	private String id;

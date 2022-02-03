@@ -2,14 +2,14 @@ package chamette.datasets;
 
 import java.util.Date;
 import java.util.TimerTask;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Class that check if Datasets are updated a,nd must be downloaded again.
  *
  */
 public class DownloadEngine extends TimerTask { 
-	private static final Logger LOGGER = Logger.getLogger(DownloadEngine.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(DownloadEngine.class);
 	private Datasets datasets;
 	private boolean setCancel = false;
 	private Date lastUpdate;

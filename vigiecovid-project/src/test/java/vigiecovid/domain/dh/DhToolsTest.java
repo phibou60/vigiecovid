@@ -5,11 +5,11 @@ import static org.junit.Assert.*;
 import java.time.LocalDate;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 public class DhToolsTest {
-	private static final Logger LOGGER = Logger.getLogger(DhToolsTest.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(DhToolsTest.class);
 
 	@Test
 	public void testCalculLinearProjection() throws Exception {

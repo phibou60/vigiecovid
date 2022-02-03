@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +21,7 @@ import vigiecovid.domain.testvir.TestVirTools;
 @Controller
 public class TestvirController {
 
-	private static final Logger LOGGER = Logger.getLogger(TestvirController.class);
+	private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getFormatterLogger(TestvirController.class);
 
 	@Autowired
 	private TestVirDAO testVirDAO;	
